@@ -1,14 +1,9 @@
 class Pokemon:
-    def __init__(self, name, level, type_):
-        """
-        Represents a Pokémon with basic info.
-        """
+    def __init__(self, name, level, ptype, sprite=None):
         self.name = name
         self.level = level
-        self.type_ = type_
+        self.ptype = ptype
+        self.sprite = sprite or f"assets/sprites/{self.name.lower()}.png"
 
     def summary(self):
-        """
-        Returns a formatted string summary of the Pokémon's data.
-        """
-        return f"{self.name}\nLv.{self.level}\nType: {self.type_}"
+        return f"{self.name} (Lvl {self.level}) - Type: {self.ptype}"

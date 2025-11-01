@@ -9,7 +9,12 @@
   ],
   "boxes": [
     [
-      null,
+      {
+        "name": "Bulbasaur",
+        "level": 5,
+        "ptype": "Grass/Poison",
+        "sprite": "assets\\sprites\\bulbasaur.png"
+      },
       null,
       null,
       null,
