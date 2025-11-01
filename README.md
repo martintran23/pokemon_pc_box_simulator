@@ -6,7 +6,7 @@ You can view your **party**, browse through **multiple PC boxes**, and inspect e
 ---
 
 ## 🗂️ Project Structure
-
+```
 pokemon_pc/
 │
 ├── main.py         # Entry point of the app (launches the GUI)
@@ -22,6 +22,7 @@ pokemon_pc/
 │
 └── assets/
 └── sprites/
+```
 
 ---
 
