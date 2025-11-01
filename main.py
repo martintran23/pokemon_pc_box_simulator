@@ -19,11 +19,11 @@ class PCApp(tk.Tk):
         self.resizable(False, False)
 
         self.player = player
-        self.drag_data = {"pokemon": None, "origin_index": None, "origin_area": None, "floating": None}
+        self.drag_data = {"widget": None, "pokemon": None, "origin_index": None, "origin_area": None, "floating": None}
 
         # --- Load images ---
         bg_path = os.path.join(BASE_DIR, "assets", "bg", "box_bg.png")
-        bg_raw = Image.open(bg_path).resize((650, 550))
+        bg_raw = Image.open(bg_path).resize((650, 500))
         self.bg_image = ImageTk.PhotoImage(bg_raw)
 
         add_icon_path = os.path.join(BASE_DIR, "assets", "icons", "add_icon.png")
@@ -31,6 +31,10 @@ class PCApp(tk.Tk):
 
         # Sprite cache
         self.sprite_cache = {}
+
+        # Ensure player has 3 boxes
+        while len(player.boxes) < 3:
+            player.boxes.append(PCBox(f"Box {len(player.boxes) + 1}"))
 
         self.create_widgets()
         self.load_game()
@@ -71,10 +75,19 @@ class PCApp(tk.Tk):
         self.box_frame = tk.Frame(self.pc_area, bg="#ff9b9b", padx=20, pady=20)
         self.box_frame.pack(expand=True)
 
+        # Navigation buttons (always visible)
+        nav_frame = tk.Frame(self.box_frame, bg="#ff9b9b")
+        nav_frame.pack(side="bottom", pady=10)
+        tk.Button(nav_frame, text="< Prev", command=self.prev_box).grid(row=0, column=0, padx=10)
+        self.box_name_lbl = tk.Label(nav_frame, text="", bg="#ff9b9b", font=("Arial", 12, "bold"))
+        self.box_name_lbl.grid(row=0, column=1)
+        tk.Button(nav_frame, text="Next >", command=self.next_box).grid(row=0, column=2, padx=10)
+
+        # Box canvas above navigation
         self.box_canvas = tk.Canvas(
-            self.box_frame, width=650, height=550, highlightthickness=0, bg="#ffffff"
+            self.box_frame, width=650, height=500, highlightthickness=0, bg="#ffffff"
         )
-        self.box_canvas.pack()
+        self.box_canvas.pack(side="top")
         self.box_canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
 
         # 30 slot buttons
@@ -92,14 +105,6 @@ class PCApp(tk.Tk):
             btn.bind("<Button-3>", lambda e, i=i: self.right_click("box", i))
             self.slot_buttons.append(btn)
             self.slot_positions.append((x, y))
-
-        # Navigation buttons
-        nav_frame = tk.Frame(self.box_frame, bg="#ff9b9b")
-        nav_frame.pack(pady=10)
-        tk.Button(nav_frame, text="< Prev", command=self.prev_box).grid(row=0, column=0, padx=10)
-        self.box_name_lbl = tk.Label(nav_frame, text="", bg="#ff9b9b", font=("Arial", 12, "bold"))
-        self.box_name_lbl.grid(row=0, column=1)
-        tk.Button(nav_frame, text="Next >", command=self.next_box).grid(row=0, column=2, padx=10)
 
     # ---------------- Save/Load ----------------
     def save_game(self):
@@ -149,21 +154,17 @@ class PCApp(tk.Tk):
     def get_sprite(self, pokemon, size=(60, 60)):
         if not pokemon:
             return self.add_icon
-
-        key = f"{pokemon.name}_{size[0]}x{size[1]}"
-        if key in self.sprite_cache:
-            return self.sprite_cache[key]
-
+        if pokemon.name in self.sprite_cache:
+            return self.sprite_cache[pokemon.name]
         try:
             img_path = pokemon.sprite
             if not os.path.exists(img_path):
                 print(f"⚠️ Sprite not found for {pokemon.name}: {img_path}")
                 return self.add_icon
-
             img_raw = Image.open(img_path).convert("RGBA")
             img_raw = img_raw.resize(size, Image.Resampling.LANCZOS)
             img = ImageTk.PhotoImage(img_raw)
-            self.sprite_cache[key] = img
+            self.sprite_cache[pokemon.name] = img
             return img
         except Exception as e:
             print(f"⚠️ Failed to load sprite for {pokemon.name}: {e}")
@@ -171,11 +172,13 @@ class PCApp(tk.Tk):
 
     # ---------------- Update Display ----------------
     def update_display(self):
+        # Party
         for i, mon in enumerate(self.player.party):
             sprite_img = self.get_sprite(mon)
             self.party_labels[i].image = sprite_img
             self.party_labels[i].config(text="", image=sprite_img)
 
+        # Box
         box = self.player.get_current_box()
         self.box_name_lbl.config(text=box.name)
         for i, mon in enumerate(box.pokemon):
@@ -184,20 +187,20 @@ class PCApp(tk.Tk):
             self.slot_buttons[i].config(text="", image=sprite_img)
 
     # ---------------- Pokémon Actions ----------------
-    def add_pokemon(self, index):
+    def add_pokemon(self, index, area="box"):
         name = simpledialog.askstring("Add Pokémon", "Enter Pokémon name:")
         if not name:
             return
         level = simpledialog.askinteger("Level", "Enter level:", minvalue=1, maxvalue=100)
         ptype = simpledialog.askstring("Type", "Enter type:")
-        sprite_filename = simpledialog.askstring(
-            "Sprite Filename",
-            "Optional: enter sprite filename (e.g., bulbasaur.png):"
-        )
+        sprite_filename = simpledialog.askstring("Sprite Filename", "Optional: enter sprite filename (e.g., bulbasaur.png):")
         if name and level and ptype:
             sprite_path = os.path.join(BASE_DIR, "assets", "sprites", sprite_filename) if sprite_filename else os.path.join(BASE_DIR, "assets", "sprites", f"{name.lower()}.png")
             new_mon = Pokemon(name, level, ptype, sprite=sprite_path)
-            self.player.get_current_box().add_pokemon(new_mon, index)
+            if area == "box":
+                self.player.get_current_box().add_pokemon(new_mon, index)
+            else:
+                self.player.party[index] = new_mon
             self.update_display()
             self.save_game()
 
@@ -217,7 +220,6 @@ class PCApp(tk.Tk):
             confirm = messagebox.askyesno("Remove Pokémon", f"Release {mon.name}?")
             if confirm:
                 self.player.party[index] = None
-
         self.update_display()
         self.save_game()
 
@@ -230,33 +232,32 @@ class PCApp(tk.Tk):
 
     # ---------------- Drag and Drop ----------------
     def start_drag(self, event, area, index):
+        widget = event.widget
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if not mon:
+            self.add_pokemon(index, area)
             return
-        sprite_img = self.get_sprite(mon, size=(90, 90))
+
+        sprite_img = self.get_sprite(mon, size=(60, 60))
         floating = tk.Toplevel(self)
         floating.overrideredirect(True)
         floating.attributes("-topmost", True)
         lbl = tk.Label(floating, image=sprite_img)
         lbl.pack()
-        x_root = self.winfo_pointerx() - 45
-        y_root = self.winfo_pointery() - 45
+        x_root = self.winfo_pointerx() - 30
+        y_root = self.winfo_pointery() - 30
         floating.geometry(f"+{x_root}+{y_root}")
-        self.drag_data = {
-            "pokemon": mon,
-            "origin_index": index,
-            "origin_area": area,
-            "floating": floating,
-        }
+
+        self.drag_data = {"widget": widget, "pokemon": mon, "origin_index": index, "origin_area": area, "floating": floating}
         self.bind("<Motion>", self.on_motion)
-        self.bind("<ButtonRelease-1>", self.end_drag)
 
     def on_motion(self, event):
         floating = self.drag_data.get("floating")
-        if floating:
-            x_root = self.winfo_pointerx() - 45
-            y_root = self.winfo_pointery() - 45
-            floating.geometry(f"+{x_root}+{y_root}")
+        if not floating:
+            return
+        x_root = self.winfo_pointerx() - 30
+        y_root = self.winfo_pointery() - 30
+        floating.geometry(f"+{x_root}+{y_root}")
 
     def end_drag(self, event):
         floating = self.drag_data.get("floating")
@@ -266,9 +267,9 @@ class PCApp(tk.Tk):
         x_root = self.winfo_pointerx()
         y_root = self.winfo_pointery()
 
-        # Check party
         target_index = None
         target_area = None
+
         for i, lbl in enumerate(self.party_labels):
             x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
             x2, y2 = x1 + lbl.winfo_width(), y1 + lbl.winfo_height()
@@ -277,7 +278,6 @@ class PCApp(tk.Tk):
                 target_area = "party"
                 break
 
-        # Check box
         if target_index is None:
             for i, lbl in enumerate(self.slot_buttons):
                 x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
@@ -291,7 +291,6 @@ class PCApp(tk.Tk):
         origin_index = self.drag_data["origin_index"]
         mon = self.drag_data["pokemon"]
 
-        # Swap if valid target
         if target_area is not None:
             if target_area == "party":
                 target_list = self.player.party
@@ -301,28 +300,28 @@ class PCApp(tk.Tk):
                 origin_list = self.player.party
             else:
                 origin_list = self.player.get_current_box().pokemon
-
-            # Swap Pokémon
             target_list[target_index], origin_list[origin_index] = origin_list[origin_index], target_list[target_index]
 
-        # Destroy floating image
         floating.destroy()
-        self.drag_data = {"pokemon": None, "origin_index": None, "origin_area": None, "floating": None}
+        self.drag_data = {"widget": None, "pokemon": None, "origin_index": None, "origin_area": None, "floating": None}
         self.unbind("<Motion>")
-        self.unbind("<ButtonRelease-1>")
         self.update_display()
         self.save_game()
 
     def right_click(self, area, index):
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if mon:
-            choice = messagebox.askyesnocancel(
+            action = messagebox.askquestion(
                 "Pokémon Action",
-                "Yes=Info, No=Release, Cancel=Do Nothing"
+                "Do you want to view info or release?",
+                icon="question",
+                type="yesnocancel",
+                default="yes",
+                detail="Yes=Info, No=Release, Cancel=Nothing"
             )
-            if choice is True:
+            if action == "yes":
                 self.show_pokemon(area, index)
-            elif choice is False:
+            elif action == "no":
                 self.remove_pokemon(index, area)
 
     # ---------------- Box Navigation ----------------
