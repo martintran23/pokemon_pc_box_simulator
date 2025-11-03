@@ -23,7 +23,7 @@ class PCApp(tk.Tk):
 
         # --- Load images ---
         bg_path = os.path.join(BASE_DIR, "assets", "bg", "box_bg.png")
-        bg_raw = Image.open(bg_path).resize((650, 500))
+        bg_raw = Image.open(bg_path).resize((650, 550))
         self.bg_image = ImageTk.PhotoImage(bg_raw)
 
         add_icon_path = os.path.join(BASE_DIR, "assets", "icons", "add_icon.png")
@@ -75,19 +75,10 @@ class PCApp(tk.Tk):
         self.box_frame = tk.Frame(self.pc_area, bg="#ff9b9b", padx=20, pady=20)
         self.box_frame.pack(expand=True)
 
-        # Navigation buttons (always visible)
-        nav_frame = tk.Frame(self.box_frame, bg="#ff9b9b")
-        nav_frame.pack(side="bottom", pady=10)
-        tk.Button(nav_frame, text="< Prev", command=self.prev_box).grid(row=0, column=0, padx=10)
-        self.box_name_lbl = tk.Label(nav_frame, text="", bg="#ff9b9b", font=("Arial", 12, "bold"))
-        self.box_name_lbl.grid(row=0, column=1)
-        tk.Button(nav_frame, text="Next >", command=self.next_box).grid(row=0, column=2, padx=10)
-
-        # Box canvas above navigation
         self.box_canvas = tk.Canvas(
-            self.box_frame, width=650, height=500, highlightthickness=0, bg="#ffffff"
+            self.box_frame, width=650, height=550, highlightthickness=0, bg="#ffffff"
         )
-        self.box_canvas.pack(side="top")
+        self.box_canvas.pack()
         self.box_canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
 
         # 30 slot buttons
@@ -105,6 +96,14 @@ class PCApp(tk.Tk):
             btn.bind("<Button-3>", lambda e, i=i: self.right_click("box", i))
             self.slot_buttons.append(btn)
             self.slot_positions.append((x, y))
+
+        # Navigation buttons
+        nav_frame = tk.Frame(self.box_frame, bg="#ff9b9b")
+        nav_frame.pack(pady=10)
+        tk.Button(nav_frame, text="< Prev", command=self.prev_box).grid(row=0, column=0, padx=10)
+        self.box_name_lbl = tk.Label(nav_frame, text="", bg="#ff9b9b", font=("Arial", 12, "bold"))
+        self.box_name_lbl.grid(row=0, column=1)
+        tk.Button(nav_frame, text="Next >", command=self.next_box).grid(row=0, column=2, padx=10)
 
     # ---------------- Save/Load ----------------
     def save_game(self):
@@ -188,21 +187,39 @@ class PCApp(tk.Tk):
 
     # ---------------- Pokémon Actions ----------------
     def add_pokemon(self, index, area="box"):
+        # Get basic info
         name = simpledialog.askstring("Add Pokémon", "Enter Pokémon name:")
         if not name:
             return
         level = simpledialog.askinteger("Level", "Enter level:", minvalue=1, maxvalue=100)
         ptype = simpledialog.askstring("Type", "Enter type:")
-        sprite_filename = simpledialog.askstring("Sprite Filename", "Optional: enter sprite filename (e.g., bulbasaur.png):")
+        sprite_filename = simpledialog.askstring(
+            "Sprite Filename", "Optional: enter sprite filename (e.g., bulbasaur.png):"
+        )
+
+        # Get item
+        item = simpledialog.askstring("Held Item", "Optional: enter held item:")
+
+        # Get moves
+        moves = []
+        for i in range(4):
+            move = simpledialog.askstring("Move", f"Enter move {i+1} (leave blank to skip):")
+            if move:
+                moves.append(move)
+
         if name and level and ptype:
             sprite_path = os.path.join(BASE_DIR, "assets", "sprites", sprite_filename) if sprite_filename else os.path.join(BASE_DIR, "assets", "sprites", f"{name.lower()}.png")
-            new_mon = Pokemon(name, level, ptype, sprite=sprite_path)
+            new_mon = Pokemon(name, level, ptype, sprite=sprite_path, moves=moves, item=item)
+
+            # Place in box or party
             if area == "box":
                 self.player.get_current_box().add_pokemon(new_mon, index)
             else:
                 self.player.party[index] = new_mon
+
             self.update_display()
             self.save_game()
+
 
     def remove_pokemon(self, index, area="box"):
         if area == "box":
@@ -226,7 +243,12 @@ class PCApp(tk.Tk):
     def show_pokemon(self, area, index):
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if mon:
-            messagebox.showinfo("Pokémon Info", mon.summary())
+            summary = f"{mon.name} (Lvl {mon.level}) - Type: {mon.ptype}"
+            if hasattr(mon, "item") and mon.item:
+                summary += f"\nHeld Item: {mon.item}"
+            if hasattr(mon, "moves") and mon.moves:
+                summary += "\nMoves:\n" + "\n".join(f"- {move}" for move in mon.moves)
+            messagebox.showinfo("Pokémon Info", summary)
         else:
             messagebox.showinfo("Empty Slot", "No Pokémon here!")
 
@@ -235,20 +257,30 @@ class PCApp(tk.Tk):
         widget = event.widget
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if not mon:
+            # If empty, allow adding Pokémon
             self.add_pokemon(index, area)
             return
 
         sprite_img = self.get_sprite(mon, size=(60, 60))
+
+        # Floating image under cursor
         floating = tk.Toplevel(self)
         floating.overrideredirect(True)
         floating.attributes("-topmost", True)
-        lbl = tk.Label(floating, image=sprite_img)
+        lbl = tk.Label(floating, image=sprite_img, bg="white")
         lbl.pack()
         x_root = self.winfo_pointerx() - 30
         y_root = self.winfo_pointery() - 30
         floating.geometry(f"+{x_root}+{y_root}")
 
-        self.drag_data = {"widget": widget, "pokemon": mon, "origin_index": index, "origin_area": area, "floating": floating}
+        self.drag_data = {
+            "widget": widget,
+            "pokemon": mon,
+            "origin_index": index,
+            "origin_area": area,
+            "floating": floating
+        }
+
         self.bind("<Motion>", self.on_motion)
 
     def on_motion(self, event):
@@ -270,6 +302,7 @@ class PCApp(tk.Tk):
         target_index = None
         target_area = None
 
+        # Check party slots
         for i, lbl in enumerate(self.party_labels):
             x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
             x2, y2 = x1 + lbl.winfo_width(), y1 + lbl.winfo_height()
@@ -278,6 +311,7 @@ class PCApp(tk.Tk):
                 target_area = "party"
                 break
 
+        # Check box slots
         if target_index is None:
             for i, lbl in enumerate(self.slot_buttons):
                 x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
@@ -291,6 +325,7 @@ class PCApp(tk.Tk):
         origin_index = self.drag_data["origin_index"]
         mon = self.drag_data["pokemon"]
 
+        # Swap only if valid target
         if target_area is not None:
             if target_area == "party":
                 target_list = self.player.party
