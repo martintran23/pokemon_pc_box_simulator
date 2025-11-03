@@ -13,7 +13,9 @@
         "name": "Bulbasaur",
         "level": 5,
         "ptype": "Grass/Poison",
-        "sprite": "assets\\sprites\\bulbasaur.png"
+        "sprite": "assets\\sprites\\bulbasaur.png",
+        "moves": [],
+        "item": null
       },
       null,
       null,

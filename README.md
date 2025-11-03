@@ -18,10 +18,12 @@ pokemon_pc/
 │ └── player.py     # Defines the Player class
 │
 ├── data/
-│ └── save.json     # (Optional) Persistent save data for Pokémon
+│ └── save.json     # Persistent save data for Pokémon
 │
 └── assets/
-└── sprites/
+  └── bg/           # Backgrounds
+  └── icons/
+  └── sprites/
 ```
 
 ---
