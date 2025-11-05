@@ -187,7 +187,6 @@ class PCApp(tk.Tk):
 
     # ---------------- Pokémon Actions ----------------
     def add_pokemon(self, index, area="box"):
-        # Get basic info
         name = simpledialog.askstring("Add Pokémon", "Enter Pokémon name:")
         if not name:
             return
@@ -196,11 +195,8 @@ class PCApp(tk.Tk):
         sprite_filename = simpledialog.askstring(
             "Sprite Filename", "Optional: enter sprite filename (e.g., bulbasaur.png):"
         )
-
-        # Get item
         item = simpledialog.askstring("Held Item", "Optional: enter held item:")
 
-        # Get moves
         moves = []
         for i in range(4):
             move = simpledialog.askstring("Move", f"Enter move {i+1} (leave blank to skip):")
@@ -211,7 +207,6 @@ class PCApp(tk.Tk):
             sprite_path = os.path.join(BASE_DIR, "assets", "sprites", sprite_filename) if sprite_filename else os.path.join(BASE_DIR, "assets", "sprites", f"{name.lower()}.png")
             new_mon = Pokemon(name, level, ptype, sprite=sprite_path, moves=moves, item=item)
 
-            # Place in box or party
             if area == "box":
                 self.player.get_current_box().add_pokemon(new_mon, index)
             else:
@@ -219,7 +214,6 @@ class PCApp(tk.Tk):
 
             self.update_display()
             self.save_game()
-
 
     def remove_pokemon(self, index, area="box"):
         if area == "box":
@@ -252,18 +246,40 @@ class PCApp(tk.Tk):
         else:
             messagebox.showinfo("Empty Slot", "No Pokémon here!")
 
+    def edit_pokemon(self, area, index):
+        mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
+        if not mon:
+            messagebox.showinfo("Empty Slot", "No Pokémon here!")
+            return
+
+        # Edit item
+        new_item = simpledialog.askstring("Edit Held Item", f"Current item: {mon.item or '(none)'}\nEnter new item (leave blank to remove):")
+        if new_item is not None:
+            mon.item = new_item.strip() if new_item.strip() else None
+
+        # Edit moves
+        new_moves = []
+        for i in range(4):
+            current_move = mon.moves[i] if i < len(mon.moves) else ""
+            move = simpledialog.askstring("Edit Move", f"Move {i+1} (current: {current_move}):\nLeave blank to skip")
+            if move:
+                new_moves.append(move)
+            elif current_move:
+                new_moves.append(current_move)
+        mon.moves = new_moves
+
+        self.update_display()
+        self.save_game()
+
     # ---------------- Drag and Drop ----------------
     def start_drag(self, event, area, index):
         widget = event.widget
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if not mon:
-            # If empty, allow adding Pokémon
             self.add_pokemon(index, area)
             return
 
         sprite_img = self.get_sprite(mon, size=(60, 60))
-
-        # Floating image under cursor
         floating = tk.Toplevel(self)
         floating.overrideredirect(True)
         floating.attributes("-topmost", True)
@@ -302,7 +318,6 @@ class PCApp(tk.Tk):
         target_index = None
         target_area = None
 
-        # Check party slots
         for i, lbl in enumerate(self.party_labels):
             x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
             x2, y2 = x1 + lbl.winfo_width(), y1 + lbl.winfo_height()
@@ -311,7 +326,6 @@ class PCApp(tk.Tk):
                 target_area = "party"
                 break
 
-        # Check box slots
         if target_index is None:
             for i, lbl in enumerate(self.slot_buttons):
                 x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
@@ -325,7 +339,6 @@ class PCApp(tk.Tk):
         origin_index = self.drag_data["origin_index"]
         mon = self.drag_data["pokemon"]
 
-        # Swap only if valid target
         if target_area is not None:
             if target_area == "party":
                 target_list = self.player.party
@@ -348,16 +361,18 @@ class PCApp(tk.Tk):
         if mon:
             action = messagebox.askquestion(
                 "Pokémon Action",
-                "Do you want to view info or release?",
+                "Do you want to view info, release, or edit?",
                 icon="question",
                 type="yesnocancel",
                 default="yes",
-                detail="Yes=Info, No=Release, Cancel=Nothing"
+                detail="Yes=Info, No=Release, Cancel=Edit"
             )
             if action == "yes":
                 self.show_pokemon(area, index)
             elif action == "no":
                 self.remove_pokemon(index, area)
+            else:  # Cancel pressed
+                self.edit_pokemon(area, index)
 
     # ---------------- Box Navigation ----------------
     def next_box(self):
