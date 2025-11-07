@@ -69,13 +69,12 @@ class PCApp(tk.Tk):
             lbl = tk.Label(
                 self.party_frame,
                 text="(empty)",
-                width=20,
-                height=2,
                 bd=2,
                 relief="raised",
                 bg="#ffffff",
                 compound="top",
             )
+            lbl.config(width=75, height=75)
             lbl.pack(pady=5)
             # binds
             lbl.bind("<Button-1>", lambda e, i=i: self.start_drag(e, "party", i))
