@@ -15,7 +15,7 @@ class PCApp(tk.Tk):
     def __init__(self, player):
         super().__init__()
         self.title("Pokémon PC Box System")
-        self.geometry("850x600")
+        self.geometry("900x700")
         self.resizable(False, False)
 
         self.player = player
