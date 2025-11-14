@@ -98,8 +98,8 @@ class PCApp(tk.Tk):
         # 30 slot labels (used like buttons)
         self.slot_buttons = []
         self.slot_positions = []
-        start_x, start_y = 60, 60
-        gap_x, gap_y = 90, 85
+        start_x, start_y = 50, 50
+        gap_x, gap_y = 100, 90
         for i in range(30):
             x = start_x + (i % 6) * gap_x
             y = start_y + (i // 6) * gap_y
