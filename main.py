@@ -10,6 +10,10 @@ from models.player import Player
 SAVE_PATH = "data/save.json"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Level bounds (change if desired)
+MIN_LEVEL = 1
+MAX_LEVEL = 100
+
 
 class PCApp(tk.Tk):
     def __init__(self, player):
@@ -224,38 +228,66 @@ class PCApp(tk.Tk):
 
     # ---------------- Pokémon Actions ----------------
     def add_pokemon(self, index, area="box"):
+        """Prompt user for pokemon details, validate, and add to box/party."""
+        # Name
         name = simpledialog.askstring("Add Pokémon", "Enter Pokémon name:")
         if not name:
             return
-        level = simpledialog.askinteger("Level", "Enter level:", minvalue=1, maxvalue=100)
-        ptype = simpledialog.askstring("Type", "Enter type:")
+
+        # Level: use askstring to have explicit validation / error messages below
+        level_val = simpledialog.askstring("Level", f"Enter level ({MIN_LEVEL}-{MAX_LEVEL}):")
+        if level_val is None:
+            return
+        try:
+            level = int(level_val)
+        except ValueError:
+            messagebox.showerror("Invalid Level", "Level must be an integer.")
+            return
+        if level < MIN_LEVEL:
+            messagebox.showerror("Invalid Level", f"Level must be at least {MIN_LEVEL}.")
+            return
+        if level > MAX_LEVEL:
+            messagebox.showerror("Invalid Level", f"Level cannot exceed {MAX_LEVEL}.")
+            return
+
+        # Type (require at least one)
+        ptype = simpledialog.askstring("Type", "Enter type (required, e.g. 'Grass' or 'Grass,Poison'):")
+        if ptype is None:
+            return
+        ptype = ptype.strip()
+        if not ptype:
+            messagebox.showerror("Invalid Type", "You must enter at least one type.")
+            return
+
+        # Sprite filename (optional)
         sprite_filename = simpledialog.askstring(
             "Sprite Filename", "Optional: enter sprite filename (e.g., bulbasaur.png):"
         )
+        # Item (optional)
         item = simpledialog.askstring("Held Item", "Optional: enter held item:")
 
+        # Moves
         moves = []
         for i in range(4):
-            move = simpledialog.askstring("Move", f"Enter move {i+1} (leave blank to skip):")
-            if move:
-                moves.append(move)
+            mv = simpledialog.askstring("Move", f"Enter move {i+1} (leave blank to skip):")
+            if mv:
+                moves.append(mv)
 
-        if name and level and ptype:
-            sprite_path = os.path.join("assets", "sprites", sprite_filename) if sprite_filename else os.path.join("assets", "sprites", f"{name.lower()}.png")
-            new_mon = Pokemon(name, level, ptype, sprite=sprite_path, moves=moves, item=item)
+        # create pokemon
+        sprite_path = os.path.join("assets", "sprites", sprite_filename) if sprite_filename else os.path.join("assets", "sprites", f"{name.lower()}.png")
+        new_mon = Pokemon(name, level, ptype, sprite=sprite_path, moves=moves, item=item)
 
-            if area == "box":
-                box = self.player.get_current_box()
-                if box:
-                    box.add_pokemon(new_mon, index)
-            else:
-                # ensure party length
-                while len(self.player.party) < 6:
-                    self.player.party.append(None)
-                self.player.party[index] = new_mon
+        if area == "box":
+            box = self.player.get_current_box()
+            if box:
+                box.add_pokemon(new_mon, index)
+        else:
+            while len(self.player.party) < 6:
+                self.player.party.append(None)
+            self.player.party[index] = new_mon
 
-            self.update_display()
-            self.save_game()
+        self.update_display()
+        self.save_game()
 
     def remove_pokemon(self, index, area="box"):
         if area == "box":
@@ -358,19 +390,39 @@ class PCApp(tk.Tk):
         # Buttons
         btn_frame = tk.Frame(win, pady=8)
         btn_frame.pack(fill="x")
+
         def on_save():
             # validate and save
             new_name = name_entry.get().strip()
             if new_name:
                 mon.name = new_name
+
+            # Validate level
+            lvl_text = level_entry.get().strip()
             try:
-                mon.level = int(level_entry.get())
-            except Exception:
-                mon.level = mon.level  # keep old if invalid
-            mon.ptype = type_entry.get().strip()
-            # moves: keep exactly 4 entries (store non-empty only or all? keep as list of non-empty)
+                lvl_val = int(lvl_text)
+            except ValueError:
+                messagebox.showerror("Invalid Level", "Level must be an integer.")
+                return
+            if lvl_val < MIN_LEVEL:
+                messagebox.showerror("Invalid Level", f"Level must be at least {MIN_LEVEL}.")
+                return
+            if lvl_val > MAX_LEVEL:
+                messagebox.showerror("Invalid Level", f"Level cannot exceed {MAX_LEVEL}.")
+                return
+            mon.level = lvl_val
+
+            # Validate type
+            new_type = type_entry.get().strip()
+            if not new_type:
+                messagebox.showerror("Invalid Type", "You must enter at least one type.")
+                return
+            mon.ptype = new_type
+
+            # moves
             new_moves = [e.get().strip() for e in move_entries if e.get().strip()]
             mon.moves = new_moves
+
             new_item = item_entry.get().strip()
             mon.item = new_item if new_item != "" else None
 
