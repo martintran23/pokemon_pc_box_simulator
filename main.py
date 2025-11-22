@@ -226,57 +226,112 @@ class PCApp(tk.Tk):
                 else:
                     self.slot_buttons[i].config(text="", image=sprite_img)
 
+    def ask_field(self, title, prompt, required=False, to_int=False, min_val=None, max_val=None, **kwargs):
+        """
+        Unified input dialog with optional integer conversion and bounds.
+        Accepts:
+        - required: bool (re-ask until non-empty)
+        - to_int: bool (convert input -> int)
+        - min_val / max_val: numeric bounds
+        Also accepts alias names min_value / max_value via kwargs so old calls won't break.
+        Returns:
+        - int (if to_int True and valid)
+        - str (if to_int False)
+        - None if user cancels
+        """
+        import tkinter.simpledialog as sd
+        import tkinter.messagebox as mb
+
+        # support alternate alias names
+        if min_val is None and "min_value" in kwargs:
+            min_val = kwargs.get("min_value")
+        if max_val is None and "max_value" in kwargs:
+            max_val = kwargs.get("max_value")
+
+        while True:
+            value = sd.askstring(title, prompt, parent=self)
+            if value is None:
+                # user pressed Cancel
+                return None
+
+            # trim
+            v = value.strip()
+
+            if required and v == "":
+                mb.showerror("Error", "This field is required.")
+                continue
+
+            if to_int:
+                if v == "":
+                    # empty not allowed for required integers
+                    if required:
+                        mb.showerror("Error", "This field is required and must be an integer.")
+                        continue
+                    else:
+                        return ""  # allow empty if not required (caller must handle)
+                try:
+                    iv = int(v)
+                except ValueError:
+                    mb.showerror("Error", "Please enter a valid integer.")
+                    continue
+
+                if (min_val is not None) and (iv < min_val):
+                    mb.showerror("Error", f"Value must be ≥ {min_val}.")
+                    continue
+                if (max_val is not None) and (iv > max_val):
+                    mb.showerror("Error", f"Value must be ≤ {max_val}.")
+                    continue
+
+                return iv
+
+            # not integer mode: return stripped string (could be empty if allowed)
+            return v
+
     # ---------------- Pokémon Actions ----------------
     def add_pokemon(self, index, area="box"):
-        """Prompt user for pokemon details, validate, and add to box/party."""
-        # Name
-        name = simpledialog.askstring("Add Pokémon", "Enter Pokémon name:")
-        if not name:
-            return
+        # name (required)
+        name = self.ask_field("Add Pokémon", "Enter Pokémon name:", required=True)
+        if name is None:
+            return  # cancelled
 
-        # Level: use askstring to have explicit validation / error messages below
-        level_val = simpledialog.askstring("Level", f"Enter level ({MIN_LEVEL}-{MAX_LEVEL}):")
-        if level_val is None:
-            return
-        try:
-            level = int(level_val)
-        except ValueError:
-            messagebox.showerror("Invalid Level", "Level must be an integer.")
-            return
-        if level < MIN_LEVEL:
-            messagebox.showerror("Invalid Level", f"Level must be at least {MIN_LEVEL}.")
-            return
-        if level > MAX_LEVEL:
-            messagebox.showerror("Invalid Level", f"Level cannot exceed {MAX_LEVEL}.")
-            return
+        # level (required int, with bounds)
+        level = self.ask_field(
+            "Level",
+            f"Enter level ({MIN_LEVEL}-{MAX_LEVEL}):",
+            required=True,
+            to_int=True,
+            min_val=MIN_LEVEL,
+            max_val=MAX_LEVEL,
+        )
+        if level is None:
+            return  # cancelled
 
-        # Type (require at least one)
-        ptype = simpledialog.askstring("Type", "Enter type (required, e.g. 'Grass' or 'Grass,Poison'):")
+        # type (required)
+        ptype = self.ask_field("Type", "Enter type(s) (e.g. 'Grass' or 'Grass,Poison'):", required=True)
         if ptype is None:
             return
-        ptype = ptype.strip()
-        if not ptype:
-            messagebox.showerror("Invalid Type", "You must enter at least one type.")
-            return
 
-        # Sprite filename (optional)
-        sprite_filename = simpledialog.askstring(
-            "Sprite Filename", "Optional: enter sprite filename (e.g., bulbasaur.png):"
-        )
-        # Item (optional)
-        item = simpledialog.askstring("Held Item", "Optional: enter held item:")
+        # sprite optional
+        sprite_filename = self.ask_field("Sprite", "Optional: enter sprite filename (e.g., bulbasaur.png):", required=False)
+        if sprite_filename is None:
+            return  # cancelled
 
-        # Moves
+        # item optional
+        item = self.ask_field("Held Item", "Optional: enter held item:", required=False)
+        if item is None:
+            return  # cancelled
+
+        # moves (4 optional)
         moves = []
         for i in range(4):
-            mv = simpledialog.askstring("Move", f"Enter move {i+1} (leave blank to skip):")
-            if mv:
+            mv = self.ask_field("Move", f"Enter move {i+1} (leave blank to skip):", required=False)
+            if mv is None:
+                return  # cancelled
+            if mv != "":
                 moves.append(mv)
 
-        # create pokemon
         sprite_path = os.path.join("assets", "sprites", sprite_filename) if sprite_filename else os.path.join("assets", "sprites", f"{name.lower()}.png")
         new_mon = Pokemon(name, level, ptype, sprite=sprite_path, moves=moves, item=item)
-
         if area == "box":
             box = self.player.get_current_box()
             if box:
