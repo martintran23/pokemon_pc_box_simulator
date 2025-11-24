@@ -13,7 +13,19 @@
       ],
       "item": null
     },
-    null,
+    {
+      "name": "Regigigas",
+      "level": 100,
+      "ptype": "Normal",
+      "sprite": "assets\\sprites\\regigigas.png",
+      "moves": [
+        "Heavy Slam",
+        "Earthquake",
+        "Mega Punch",
+        "Drain Punch"
+      ],
+      "item": "Leftovers"
+    },
     null,
     null,
     null,
@@ -34,19 +46,7 @@
         ],
         "item": "Venusaurite"
       },
-      {
-        "name": "Regigigas",
-        "level": 100,
-        "ptype": "Normal",
-        "sprite": "assets\\sprites\\regigigas.png",
-        "moves": [
-          "Heavy Slam",
-          "Earthquake",
-          "Mega Punch",
-          "Drain Punch"
-        ],
-        "item": "Leftovers"
-      },
+      null,
       null,
       null,
       null,
