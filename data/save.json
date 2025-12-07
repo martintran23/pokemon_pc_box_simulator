@@ -26,7 +26,19 @@
       ],
       "item": "Leftovers"
     },
-    null,
+    {
+      "name": "Aegislash",
+      "level": 70,
+      "ptype": "Steel/Ghost",
+      "sprite": "assets\\sprites\\aegislash-shield.png",
+      "moves": [
+        "Sacred Sword",
+        "King's Shield",
+        "Shadow Sneak",
+        "Night Slash"
+      ],
+      "item": ""
+    },
     null,
     null,
     null
