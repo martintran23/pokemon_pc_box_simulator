@@ -14,6 +14,19 @@
       "item": null
     },
     {
+      "name": "Latios",
+      "level": 100,
+      "ptype": "Dragon/Psychic",
+      "sprite": "assets\\sprites\\latios.png",
+      "moves": [
+        "Psychic",
+        "Dragon Pulse",
+        "Thunderbolt",
+        "Roost"
+      ],
+      "item": "Latiosite"
+    },
+    {
       "name": "Regigigas",
       "level": 100,
       "ptype": "Normal",
@@ -39,7 +52,6 @@
       ],
       "item": ""
     },
-    null,
     null,
     null
   ],
