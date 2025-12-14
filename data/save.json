@@ -70,7 +70,19 @@
         ],
         "item": "Venusaurite"
       },
-      null,
+      {
+        "name": "Venusaur",
+        "level": 75,
+        "ptype": "Grass/Poison",
+        "sprite": "assets\\sprites\\venusaur.png",
+        "moves": [
+          "Leaf Storm",
+          "Sludge Bomb",
+          "Earth Power",
+          "Sleep Powder"
+        ],
+        "item": "Life Orb"
+      },
       null,
       null,
       null,
