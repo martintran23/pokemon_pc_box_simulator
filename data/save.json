@@ -14,6 +14,19 @@
       "item": null
     },
     {
+      "name": "Venusaur",
+      "level": 75,
+      "ptype": "Grass/Poison",
+      "sprite": "assets\\sprites\\venusaur.png",
+      "moves": [
+        "Leaf Storm",
+        "Sludge Bomb",
+        "Earth Power",
+        "Sleep Powder"
+      ],
+      "item": "Life Orb"
+    },
+    {
       "name": "Latios",
       "level": 100,
       "ptype": "Dragon/Psychic",
@@ -25,19 +38,6 @@
         "Roost"
       ],
       "item": "Latiosite"
-    },
-    {
-      "name": "Regigigas",
-      "level": 100,
-      "ptype": "Normal",
-      "sprite": "assets\\sprites\\regigigas.png",
-      "moves": [
-        "Heavy Slam",
-        "Earthquake",
-        "Mega Punch",
-        "Drain Punch"
-      ],
-      "item": "Leftovers"
     },
     {
       "name": "Aegislash",
@@ -52,20 +52,20 @@
       ],
       "item": ""
     },
+    null,
     {
-      "name": "Venusaur",
-      "level": 75,
-      "ptype": "Grass/Poison",
-      "sprite": "assets\\sprites\\venusaur.png",
+      "name": "Regigigas",
+      "level": 100,
+      "ptype": "Normal",
+      "sprite": "assets\\sprites\\regigigas.png",
       "moves": [
-        "Leaf Storm",
-        "Sludge Bomb",
-        "Earth Power",
-        "Sleep Powder"
+        "Heavy Slam",
+        "Earthquake",
+        "Mega Punch",
+        "Drain Punch"
       ],
-      "item": "Life Orb"
-    },
-    null
+      "item": "Leftovers"
+    }
   ],
   "boxes": [
     [
