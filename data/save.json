@@ -1,19 +1,6 @@
 {
   "party": [
     {
-      "name": "Zoroark",
-      "level": 100,
-      "ptype": "Dark",
-      "sprite": "assets\\sprites\\zoroark.png",
-      "moves": [
-        "Dark Pulse",
-        "Extrasensory",
-        "Grass Knot",
-        "Throat Chop"
-      ],
-      "item": null
-    },
-    {
       "name": "Venusaur",
       "level": 75,
       "ptype": "Grass/Poison",
@@ -25,6 +12,19 @@
         "Sleep Powder"
       ],
       "item": "Life Orb"
+    },
+    {
+      "name": "Zoroark",
+      "level": 100,
+      "ptype": "Dark",
+      "sprite": "assets\\sprites\\zoroark.png",
+      "moves": [
+        "Dark Pulse",
+        "Extrasensory",
+        "Grass Knot",
+        "Throat Chop"
+      ],
+      "item": null
     },
     {
       "name": "Latios",
