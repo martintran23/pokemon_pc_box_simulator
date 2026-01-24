@@ -52,7 +52,19 @@
       ],
       "item": ""
     },
-    null,
+    {
+      "name": "Charizard",
+      "level": 70,
+      "ptype": "Fire/Flying",
+      "sprite": "assets\\sprites\\charizard.png",
+      "moves": [
+        "Flamethrower",
+        "Thunder Punch",
+        "Dragon Pulse",
+        "Air Slash"
+      ],
+      "item": ""
+    },
     {
       "name": "Regigigas",
       "level": 100,
