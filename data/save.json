@@ -11,7 +11,9 @@
         "Earth Power",
         "Sleep Powder"
       ],
-      "item": "Life Orb"
+      "item": "Life Orb",
+      "alt_form_name": "venusaur-gigantamax",
+      "alt_sprite": "venusaur-gigantamax.png"
     },
     {
       "name": "Latios",
@@ -24,7 +26,9 @@
         "Thunderbolt",
         "Roost"
       ],
-      "item": "Latiosite"
+      "item": "Latiosite",
+      "alt_form_name": null,
+      "alt_sprite": null
     },
     {
       "name": "Zoroark",
@@ -37,7 +41,9 @@
         "Grass Knot",
         "Throat Chop"
       ],
-      "item": null
+      "item": null,
+      "alt_form_name": null,
+      "alt_sprite": null
     },
     {
       "name": "Aegislash",
@@ -50,7 +56,9 @@
         "Shadow Sneak",
         "Night Slash"
       ],
-      "item": ""
+      "item": "",
+      "alt_form_name": null,
+      "alt_sprite": null
     },
     {
       "name": "Charizard",
@@ -63,7 +71,9 @@
         "Dragon Pulse",
         "Air Slash"
       ],
-      "item": ""
+      "item": "",
+      "alt_form_name": null,
+      "alt_sprite": null
     },
     {
       "name": "Regigigas",
@@ -76,7 +86,9 @@
         "Mega Punch",
         "Drain Punch"
       ],
-      "item": "Leftovers"
+      "item": "Leftovers",
+      "alt_form_name": null,
+      "alt_sprite": null
     }
   ],
   "boxes": [
@@ -92,7 +104,9 @@
           "Razor Leaf",
           "Solar Beam"
         ],
-        "item": "Venusaurite"
+        "item": "Venusaurite",
+        "alt_form_name": null,
+        "alt_sprite": null
       },
       null,
       null,
