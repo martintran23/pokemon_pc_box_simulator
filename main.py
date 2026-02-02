@@ -366,15 +366,65 @@ class PCApp(tk.Tk):
     # ---------------- Info (view only) ----------------
     def show_pokemon(self, area, index):
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
-        if mon:
-            summary = f"{mon.name} (Lvl {mon.level}) - Type: {mon.ptype}"
-            if hasattr(mon, "item") and mon.item:
-                summary += f"\nHeld Item: {mon.item}"
-            if hasattr(mon, "moves") and mon.moves:
-                summary += "\nMoves:\n" + "\n".join(f"- {move}" for move in mon.moves)
-            messagebox.showinfo("Pokémon Info", summary)
-        else:
+        if not mon:
             messagebox.showinfo("Empty Slot", "No Pokémon here!")
+            return
+
+        win = tk.Toplevel(self)
+        win.title(f"{mon.name} Info")
+        win.resizable(False, False)
+
+        # ---- Basic Info ----
+        basic_frame = tk.Frame(win, padx=10, pady=8)
+        basic_frame.pack(fill="x")
+
+        tk.Label(basic_frame, text="Name:", font=("Arial", 10, "bold")).grid(row=0, column=0, sticky="w")
+        tk.Label(basic_frame, text=mon.name).grid(row=0, column=1, sticky="w", padx=6)
+
+        tk.Label(basic_frame, text="Level:", font=("Arial", 10, "bold")).grid(row=1, column=0, sticky="w")
+        tk.Label(basic_frame, text=str(mon.level)).grid(row=1, column=1, sticky="w", padx=6)
+
+        tk.Label(basic_frame, text="Type:", font=("Arial", 10, "bold")).grid(row=2, column=0, sticky="w")
+        tk.Label(basic_frame, text=mon.ptype).grid(row=2, column=1, sticky="w", padx=6)
+
+        # ---- Sprite Preview ----
+        sprite_frame = tk.Frame(win, padx=10, pady=6)
+        sprite_frame.pack(fill="x")
+        tk.Label(sprite_frame, text="Sprite Preview:", font=("Arial", 10, "bold")).pack(anchor="w")
+
+        try:
+            img = self.get_sprite(mon, size=(96, 96))
+            lbl = tk.Label(sprite_frame, image=img)
+            lbl.image = img
+            lbl.pack(pady=4)
+        except Exception:
+            tk.Label(sprite_frame, text="[No sprite]").pack()
+
+        # ---- Moves ----
+        moves_frame = tk.Frame(win, padx=10, pady=6)
+        moves_frame.pack(fill="x")
+        tk.Label(moves_frame, text="Moves:", font=("Arial", 10, "bold")).pack(anchor="w")
+
+        if mon.moves:
+            for mv in mon.moves:
+                tk.Label(moves_frame, text=f"• {mv}").pack(anchor="w")
+        else:
+            tk.Label(moves_frame, text="(No moves)").pack(anchor="w")
+
+        # ---- Held Item ----
+        item_frame = tk.Frame(win, padx=10, pady=6)
+        item_frame.pack(fill="x")
+        tk.Label(item_frame, text="Held Item:", font=("Arial", 10, "bold")).pack(anchor="w")
+        tk.Label(item_frame, text=mon.item if mon.item else "(None)").pack(anchor="w")
+
+        # ---- Close Button ----
+        btn_frame = tk.Frame(win, pady=10)
+        btn_frame.pack(fill="x")
+        tk.Button(btn_frame, text="Close", command=win.destroy).pack()
+
+        win.transient(self)
+        win.grab_set()
+        self.wait_window(win)
 
     # ---------------- Edit popup (single-window editor) ----------------
     def edit_pokemon(self, area, index):
