@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox, simpledialog, filedialog
 from PIL import Image, ImageTk, ImageDraw
 import json, os
 
@@ -9,6 +9,7 @@ from models.player import Player
 
 SAVE_PATH = "data/save.json"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SPRITE_DIR = "assets/sprites/"
 
 # Level bounds (change if desired)
 MIN_LEVEL = 1
@@ -181,7 +182,7 @@ class PCApp(tk.Tk):
         if key in self.sprite_cache:
             return self.sprite_cache[key]
         try:
-            img_path = pokemon.sprite
+            img_path = pokemon.get_sprite_path(show_alt=False)
             # if path is relative, make absolute relative to BASE_DIR
             if not os.path.isabs(img_path):
                 img_path = os.path.join(BASE_DIR, img_path)
@@ -201,6 +202,19 @@ class PCApp(tk.Tk):
         except Exception as e:
             print(f"⚠️ Failed to load sprite for {pokemon.name}: {e}")
             return self.add_icon
+
+    def get_display_sprite(self, mon, size=(96, 96), use_alt=False):
+        """
+        Returns a Tkinter PhotoImage for the Pokémon.
+        If use_alt is True and mon.alt_sprite exists, returns the alternate sprite.
+        """
+        from PIL import Image, ImageTk
+
+        path = mon.alt_sprite if use_alt and mon.alt_sprite else getattr(mon, "sprite", None)
+        if not path:
+            raise FileNotFoundError("No sprite available")
+        img = Image.open(path).resize(size, Image.Resampling.LANCZOS)
+        return ImageTk.PhotoImage(img)
 
     # ---------------- Update Display ----------------
     def update_display(self):
@@ -433,14 +447,23 @@ class PCApp(tk.Tk):
             messagebox.showinfo("Empty Slot", "No Pokémon here!")
             return
 
+        # Ensure alt attributes exist (safe for old saves)
+        if not hasattr(mon, "alt_form_name"):
+            mon.alt_form_name = None
+        if not hasattr(mon, "alt_sprite"):
+            mon.alt_sprite = None
+
         # Create edit window
         win = tk.Toplevel(self)
         win.title(f"Edit {mon.name}")
         win.resizable(False, False)
 
+        # =====================
         # Basic info frame
+        # =====================
         basic_frame = tk.Frame(win, padx=10, pady=8)
         basic_frame.pack(fill="x")
+
         tk.Label(basic_frame, text="Name:").grid(row=0, column=0, sticky="w")
         name_entry = tk.Entry(basic_frame)
         name_entry.insert(0, mon.name)
@@ -458,33 +481,102 @@ class PCApp(tk.Tk):
 
         basic_frame.columnconfigure(1, weight=1)
 
-        # Sprite preview (if available)
+        # =====================
+        # Sprite preview (BASE + ALT toggle)
+        # =====================
         sprite_frame = tk.Frame(win, padx=10, pady=6)
         sprite_frame.pack(fill="x")
         tk.Label(sprite_frame, text="Sprite Preview:").pack(anchor="w")
-        try:
-            preview_img = self.get_sprite(mon, size=(96, 96))
-            preview_lbl = tk.Label(sprite_frame, image=preview_img)
-            preview_lbl.image = preview_img
-            preview_lbl.pack(pady=4)
-        except Exception:
-            tk.Label(sprite_frame, text="[no sprite]").pack()
 
+        show_alt = tk.BooleanVar(value=False)
+
+        def update_preview():
+            use_alt = show_alt.get() and mon.alt_sprite
+            sprite_path = mon.alt_sprite if use_alt else mon.sprite
+
+            # Normalize the path
+            if not os.path.isabs(sprite_path):
+                if os.path.exists(sprite_path):
+                    # already a valid relative path
+                    full_path = sprite_path
+                else:
+                    # prepend sprites folder
+                    full_path = os.path.join(SPRITE_DIR, os.path.basename(sprite_path))
+            else:
+                full_path = sprite_path
+
+            try:
+                from PIL import Image, ImageTk
+                img = Image.open(full_path).resize((96, 96), Image.Resampling.LANCZOS)
+                tk_img = ImageTk.PhotoImage(img)
+                sprite_label.config(image=tk_img, text="")
+                sprite_label.image = tk_img
+            except FileNotFoundError:
+                sprite_label.config(text="[Sprite not found]", image="")
+            except Exception as e:
+                sprite_label.config(text=f"[Error: {e}]", image="")
+
+        # Initial preview
+        sprite_label = tk.Label(sprite_frame)
+        sprite_label.pack(pady=4)
+        update_preview()
+
+        if mon.alt_sprite:
+            tk.Checkbutton(
+                sprite_frame,
+                text=f"Show {mon.alt_form_name}",
+                variable=show_alt,
+                command=update_preview
+            ).pack()
+
+        # =====================
+        # Alternate Form Editor (NEW)
+        # =====================
+        alt_frame = tk.LabelFrame(win, text="Alternate Form", padx=10, pady=6)
+        alt_frame.pack(fill="x", padx=10, pady=4)
+
+        tk.Label(alt_frame, text="Form Name:").grid(row=0, column=0, sticky="w")
+        alt_name_entry = tk.Entry(alt_frame)
+        alt_name_entry.insert(0, mon.alt_form_name or "")
+        alt_name_entry.grid(row=0, column=1, sticky="ew", padx=6)
+
+        def choose_alt_sprite():
+            filename = simpledialog.askstring("Alternate Sprite", "Enter sprite filename (e.g., pikachu.png):")
+            if not filename:
+                return
+            mon.alt_sprite = filename  # store filename only, folder handled in update_preview()
+            mon.alt_form_name = alt_name_entry.get().strip() or "Alternate Form"
+            show_alt.set(True)
+            update_preview()
+
+        tk.Button(
+            alt_frame,
+            text="Set Alt Sprite",
+            command=choose_alt_sprite
+        ).grid(row=1, column=0, columnspan=2, pady=4)
+
+        alt_frame.columnconfigure(1, weight=1)
+
+        # =====================
         # Moves editor
+        # =====================
         moves_frame = tk.Frame(win, padx=10, pady=6)
         moves_frame.pack(fill="x")
         tk.Label(moves_frame, text="Moves (up to 4):").pack(anchor="w")
+
         move_entries = []
-        # ensure mon.moves has up to 4 elements
         while len(mon.moves) < 4:
             mon.moves.append("")
+
         for i in range(4):
             ent = tk.Entry(moves_frame, width=30)
             ent.insert(0, mon.moves[i])
             ent.pack(pady=2)
             move_entries.append(ent)
 
+        # =====================
         # Held item
+        # =====================
         item_frame = tk.Frame(win, padx=10, pady=6)
         item_frame.pack(fill="x")
         tk.Label(item_frame, text="Held Item:").pack(anchor="w")
@@ -492,54 +584,45 @@ class PCApp(tk.Tk):
         item_entry.insert(0, mon.item if getattr(mon, "item", None) else "")
         item_entry.pack(pady=4)
 
+        # =====================
         # Buttons
+        # =====================
         btn_frame = tk.Frame(win, pady=8)
         btn_frame.pack(fill="x")
 
         def on_save():
-            # validate and save
             new_name = name_entry.get().strip()
             if new_name:
                 mon.name = new_name
 
-            # Validate level
-            lvl_text = level_entry.get().strip()
             try:
-                lvl_val = int(lvl_text)
+                lvl_val = int(level_entry.get().strip())
             except ValueError:
                 messagebox.showerror("Invalid Level", "Level must be an integer.")
                 return
-            if lvl_val < MIN_LEVEL:
-                messagebox.showerror("Invalid Level", f"Level must be at least {MIN_LEVEL}.")
+
+            if not (MIN_LEVEL <= lvl_val <= MAX_LEVEL):
+                messagebox.showerror("Invalid Level", f"Level must be {MIN_LEVEL}–{MAX_LEVEL}.")
                 return
-            if lvl_val > MAX_LEVEL:
-                messagebox.showerror("Invalid Level", f"Level cannot exceed {MAX_LEVEL}.")
-                return
+
             mon.level = lvl_val
 
-            # Validate type
             new_type = type_entry.get().strip()
             if not new_type:
                 messagebox.showerror("Invalid Type", "You must enter at least one type.")
                 return
             mon.ptype = new_type
 
-            # moves
-            new_moves = [e.get().strip() for e in move_entries if e.get().strip()]
-            mon.moves = new_moves
-
-            new_item = item_entry.get().strip()
-            mon.item = new_item if new_item != "" else None
+            mon.moves = [e.get().strip() for e in move_entries if e.get().strip()]
+            mon.item = item_entry.get().strip() or None
+            mon.alt_form_name = alt_name_entry.get().strip() or mon.alt_form_name
 
             self.update_display()
             self.save_game()
             win.destroy()
 
-        def on_cancel():
-            win.destroy()
-
         tk.Button(btn_frame, text="Save", command=on_save, bg="#4CAF50", fg="white").pack(side="left", padx=8)
-        tk.Button(btn_frame, text="Cancel", command=on_cancel).pack(side="right", padx=8)
+        tk.Button(btn_frame, text="Cancel", command=win.destroy).pack(side="right", padx=8)
 
         win.transient(self)
         win.grab_set()
@@ -550,13 +633,10 @@ class PCApp(tk.Tk):
         widget = event.widget
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if not mon:
-            # If empty, allow adding Pokémon
             self.add_pokemon(index, area)
             return
 
         sprite_img = self.get_sprite(mon, size=(60, 60))
-
-        # Floating image under cursor
         floating = tk.Toplevel(self)
         floating.overrideredirect(True)
         floating.attributes("-topmost", True)
@@ -595,7 +675,6 @@ class PCApp(tk.Tk):
         target_index = None
         target_area = None
 
-        # Check party slots
         for i, lbl in enumerate(self.party_labels):
             x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
             x2, y2 = x1 + lbl.winfo_width(), y1 + lbl.winfo_height()
@@ -604,7 +683,6 @@ class PCApp(tk.Tk):
                 target_area = "party"
                 break
 
-        # Check box slots
         if target_index is None:
             for i, lbl in enumerate(self.slot_buttons):
                 x1, y1 = lbl.winfo_rootx(), lbl.winfo_rooty()
@@ -618,7 +696,6 @@ class PCApp(tk.Tk):
         origin_index = self.drag_data["origin_index"]
         mon = self.drag_data["pokemon"]
 
-        # Swap only if valid target
         if target_area is not None:
             if target_area == "party":
                 target_list = self.player.party
@@ -628,7 +705,6 @@ class PCApp(tk.Tk):
                 origin_list = self.player.party
             else:
                 origin_list = self.player.get_current_box().pokemon
-            # perform swap
             target_list[target_index], origin_list[origin_index] = origin_list[origin_index], target_list[target_index]
 
         floating.destroy()
@@ -640,7 +716,6 @@ class PCApp(tk.Tk):
     def right_click(self, area, index):
         mon = self.player.party[index] if area == "party" else self.player.get_current_box().pokemon[index]
         if mon:
-            # custom menu dialog to choose Info, Release, or Edit
             choice = messagebox.askquestion(
                 "Pokémon Action",
                 "What do you want to do?\nYes = Info  |  No = Release  |  Cancel = Edit",
@@ -652,7 +727,7 @@ class PCApp(tk.Tk):
                 self.show_pokemon(area, index)
             elif choice == "no":
                 self.remove_pokemon(index, area)
-            else:  # Cancel -> Edit
+            else:
                 self.edit_pokemon(area, index)
 
     # ---------------- Box Navigation ----------------
@@ -665,7 +740,6 @@ class PCApp(tk.Tk):
         self.player.current_box = (self.player.current_box - 1) % len(self.player.boxes)
         self.update_display()
         self.save_game()
-
 
 # --- MAIN ---
 if __name__ == "__main__":
