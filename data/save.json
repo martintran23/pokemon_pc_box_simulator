@@ -27,8 +27,8 @@
         "Roost"
       ],
       "item": "Latiosite",
-      "alt_form_name": null,
-      "alt_sprite": null
+      "alt_form_name": "latios-mega",
+      "alt_sprite": "latios-mega.png"
     },
     {
       "name": "Zoroark",
