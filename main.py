@@ -384,6 +384,12 @@ class PCApp(tk.Tk):
             messagebox.showinfo("Empty Slot", "No Pokémon here!")
             return
 
+        # Ensure alt attributes exist (safe for old saves)
+        if not hasattr(mon, "alt_form_name"):
+            mon.alt_form_name = None
+        if not hasattr(mon, "alt_sprite"):
+            mon.alt_sprite = None
+
         win = tk.Toplevel(self)
         win.title(f"{mon.name} Info")
         win.resizable(False, False)
@@ -401,18 +407,45 @@ class PCApp(tk.Tk):
         tk.Label(basic_frame, text="Type:", font=("Arial", 10, "bold")).grid(row=2, column=0, sticky="w")
         tk.Label(basic_frame, text=mon.ptype).grid(row=2, column=1, sticky="w", padx=6)
 
-        # ---- Sprite Preview ----
+        # ---- Sprite Preview (BASE + ALT toggle) ----
         sprite_frame = tk.Frame(win, padx=10, pady=6)
         sprite_frame.pack(fill="x")
         tk.Label(sprite_frame, text="Sprite Preview:", font=("Arial", 10, "bold")).pack(anchor="w")
 
-        try:
-            img = self.get_sprite(mon, size=(96, 96))
-            lbl = tk.Label(sprite_frame, image=img)
-            lbl.image = img
-            lbl.pack(pady=4)
-        except Exception:
-            tk.Label(sprite_frame, text="[No sprite]").pack()
+        show_alt = tk.BooleanVar(value=False)
+        sprite_label = tk.Label(sprite_frame)
+        sprite_label.pack(pady=4)
+
+        def update_preview():
+            use_alt = show_alt.get() and mon.alt_sprite
+            sprite_path = mon.alt_sprite if use_alt else mon.sprite
+
+            # Normalize sprite path
+            if sprite_path:
+                if not os.path.isabs(sprite_path):
+                    if not os.path.exists(sprite_path):
+                        sprite_path = os.path.join(SPRITE_DIR, os.path.basename(sprite_path))
+
+            try:
+                from PIL import Image, ImageTk
+                img = Image.open(sprite_path).resize((96, 96), Image.Resampling.LANCZOS)
+                tk_img = ImageTk.PhotoImage(img)
+                sprite_label.config(image=tk_img, text="")
+                sprite_label.image = tk_img
+            except Exception:
+                sprite_label.config(text="[Sprite not found]", image="")
+                sprite_label.image = None
+
+        # Initial load
+        update_preview()
+
+        if mon.alt_sprite:
+            tk.Checkbutton(
+                sprite_frame,
+                text=f"Show {mon.alt_form_name}",
+                variable=show_alt,
+                command=update_preview
+            ).pack()
 
         # ---- Moves ----
         moves_frame = tk.Frame(win, padx=10, pady=6)
