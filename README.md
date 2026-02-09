@@ -1,7 +1,7 @@
 # Pokémon PC Box Simulator
 
-A Python application that mimics the **Pokémon PC storage system** from the games.
-You can view your **party**, browse through **multiple PC boxes**, and inspect each Pokémon’s data.
+**Pokémon PC Box Simulator** is a Python-based desktop application that recreates the classic Pokémon PC storage system from the mainline games.
+It allows players to manage their active party, organize Pokémon across multiple PC boxes, and inspect individual Pokémon details in a familiar, game-inspired interface.
 
 ---
 
