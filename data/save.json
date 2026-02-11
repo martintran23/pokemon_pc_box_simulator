@@ -36,12 +36,12 @@
       "ptype": "Dark",
       "sprite": "assets\\sprites\\zoroark.png",
       "moves": [
-        "Dark Pulse",
-        "Extrasensory",
-        "Grass Knot",
-        "Throat Chop"
+        "Nasty Plot",
+        "Focus Blast",
+        "Sludge Bomb",
+        "Dark Pulse"
       ],
-      "item": null,
+      "item": "Fightium Z",
       "alt_form_name": null,
       "alt_sprite": null
     },
