@@ -1,19 +1,35 @@
 {
   "party": [
     {
-      "name": "Venusaur",
-      "level": 75,
-      "ptype": "Grass/Poison",
-      "sprite": "assets\\sprites\\venusaur.png",
+      "name": "Zoroark",
+      "level": 100,
+      "ptype": "Dark",
+      "sprite": "assets\\sprites\\zoroark.png",
       "moves": [
-        "Leaf Storm",
+        "Nasty Plot",
+        "Focus Blast",
         "Sludge Bomb",
-        "Earth Power",
-        "Sleep Powder"
+        "Dark Pulse"
       ],
-      "item": "Life Orb",
-      "alt_form_name": "venusaur-gigantamax",
-      "alt_sprite": "venusaur-gigantamax.png"
+      "item": "Fightium Z",
+      "alt_form_name": null,
+      "alt_sprite": null
+    },
+    null,
+    {
+      "name": "Aegislash",
+      "level": 70,
+      "ptype": "Steel/Ghost",
+      "sprite": "assets\\sprites\\aegislash-shield.png",
+      "moves": [
+        "Sacred Sword",
+        "King's Shield",
+        "Shadow Sneak",
+        "Night Slash"
+      ],
+      "item": "",
+      "alt_form_name": null,
+      "alt_sprite": null
     },
     {
       "name": "Latios",
@@ -31,36 +47,6 @@
       "alt_sprite": "latios-mega.png"
     },
     {
-      "name": "Zoroark",
-      "level": 100,
-      "ptype": "Dark",
-      "sprite": "assets\\sprites\\zoroark.png",
-      "moves": [
-        "Nasty Plot",
-        "Focus Blast",
-        "Sludge Bomb",
-        "Dark Pulse"
-      ],
-      "item": "Fightium Z",
-      "alt_form_name": null,
-      "alt_sprite": null
-    },
-    {
-      "name": "Aegislash",
-      "level": 70,
-      "ptype": "Steel/Ghost",
-      "sprite": "assets\\sprites\\aegislash-shield.png",
-      "moves": [
-        "Sacred Sword",
-        "King's Shield",
-        "Shadow Sneak",
-        "Night Slash"
-      ],
-      "item": "",
-      "alt_form_name": null,
-      "alt_sprite": null
-    },
-    {
       "name": "Charizard",
       "level": 70,
       "ptype": "Fire/Flying",
@@ -75,7 +61,21 @@
       "alt_form_name": null,
       "alt_sprite": null
     },
-    null
+    {
+      "name": "Venusaur",
+      "level": 75,
+      "ptype": "Grass/Poison",
+      "sprite": "assets\\sprites\\venusaur.png",
+      "moves": [
+        "Leaf Storm",
+        "Sludge Bomb",
+        "Earth Power",
+        "Sleep Powder"
+      ],
+      "item": "Life Orb",
+      "alt_form_name": "venusaur-gigantamax",
+      "alt_sprite": "venusaur-gigantamax.png"
+    }
   ],
   "boxes": [
     [
