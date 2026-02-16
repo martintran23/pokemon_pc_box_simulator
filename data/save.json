@@ -109,7 +109,21 @@
         "alt_form_name": null,
         "alt_sprite": null
       },
-      null,
+      {
+        "name": "Sylveon",
+        "level": 60,
+        "ptype": "Fairy",
+        "sprite": "assets\\sprites\\sylveon.png",
+        "moves": [
+          "Hyper Voice",
+          "Mystical Fire",
+          "Psychic",
+          "Shadow Ball"
+        ],
+        "item": "Choice Specs",
+        "alt_form_name": null,
+        "alt_sprite": null
+      },
       null,
       null,
       null,
