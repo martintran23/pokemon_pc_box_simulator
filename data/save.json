@@ -31,6 +31,21 @@
       "alt_sprite": null
     },
     {
+      "name": "Dondozo",
+      "level": 80,
+      "ptype": "Water",
+      "sprite": "assets\\sprites\\dondozo.png",
+      "moves": [
+        "Rest",
+        "Avalanche",
+        "Sleep Talk",
+        "Body Press"
+      ],
+      "item": "Leftovers",
+      "alt_form_name": null,
+      "alt_sprite": null
+    },
+    {
       "name": "Aegislash",
       "level": 70,
       "ptype": "Steel/Ghost",
@@ -59,21 +74,6 @@
       "item": "Latiosite",
       "alt_form_name": "latios-mega",
       "alt_sprite": "latios-mega.png"
-    },
-    {
-      "name": "Charizard",
-      "level": 70,
-      "ptype": "Fire/Flying",
-      "sprite": "assets\\sprites\\charizard.png",
-      "moves": [
-        "Flamethrower",
-        "Thunder Punch",
-        "Dragon Pulse",
-        "Air Slash"
-      ],
-      "item": "",
-      "alt_form_name": null,
-      "alt_sprite": null
     },
     {
       "name": "Venusaur",
@@ -124,17 +124,17 @@
         "alt_sprite": null
       },
       {
-        "name": "Dondozo",
-        "level": 80,
-        "ptype": "Water",
-        "sprite": "assets\\sprites\\dondozo.png",
+        "name": "Charizard",
+        "level": 70,
+        "ptype": "Fire/Flying",
+        "sprite": "assets\\sprites\\charizard.png",
         "moves": [
-          "Rest",
-          "Avalanche",
-          "Sleep Talk",
-          "Body Press"
+          "Flamethrower",
+          "Thunder Punch",
+          "Dragon Pulse",
+          "Air Slash"
         ],
-        "item": "Leftovers",
+        "item": "",
         "alt_form_name": null,
         "alt_sprite": null
       },
