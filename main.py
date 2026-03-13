@@ -796,43 +796,45 @@ class LoginWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Pokémon PC Box — Sign in")
-        self.geometry("400x260")
+        self.geometry("600x420")
         self.resizable(False, False)
         self.configure(bg=LOGIN_WHITE)
 
-        # Red header strip (same #ff9b9b as PC box)
-        header = tk.Frame(self, bg=LOGIN_RED, height=70)
+        # Red header strip (same #ff9b9b as PC box) — labels centered
+        header = tk.Frame(self, bg=LOGIN_RED, height=128)
         header.pack(fill="x")
         header.pack_propagate(False)
         tk.Label(
             header, text="Pokémon PC Box", font=("Arial", 20, "bold"),
             bg=LOGIN_RED, fg="#2d1b0e"
-        ).pack(pady=(14, 2))
+        ).pack(expand=True, anchor="center", pady=(22, 0))
         tk.Label(
             header, text="Sign in to access your Pokémon", font=("Arial", 10),
             bg=LOGIN_RED, fg="#4a3728"
-        ).pack(pady=(0, 4))
+        ).pack(expand=True, anchor="center", pady=(0, 18))
 
-        # Form on white
-        form = tk.Frame(self, bg=LOGIN_WHITE, padx=30, pady=20)
-        form.pack(fill="both", expand=True)
+        # Form on white — centered horizontally, slightly higher (less top margin)
+        form_outer = tk.Frame(self, bg=LOGIN_WHITE)
+        form_outer.pack(fill="both", expand=True, pady=(24, 0))
+        form = tk.Frame(form_outer, bg=LOGIN_WHITE, padx=40, pady=12)
+        form.pack(expand=True, anchor="n", pady=(8, 0))
 
-        tk.Label(form, text="Username", width=10, anchor="w", bg=LOGIN_WHITE, fg=LOGIN_DARK_BLUE, font=("Arial", 10, "bold")).grid(row=0, column=0, pady=6, sticky="w")
+        tk.Label(form, text="Username", width=10, anchor="w", bg=LOGIN_WHITE, fg=LOGIN_DARK_BLUE, font=("Arial", 10, "bold")).grid(row=0, column=0, pady=8, sticky="w")
         self.username_var = tk.StringVar()
         self.username_entry = tk.Entry(form, textvariable=self.username_var, width=26, font=("Arial", 11), bg=LOGIN_OFF_WHITE, relief="solid", highlightthickness=1, highlightbackground=LOGIN_BLUE)
-        self.username_entry.grid(row=0, column=1, pady=6, padx=(10, 0))
+        self.username_entry.grid(row=0, column=1, pady=8, padx=(12, 0))
         self.username_entry.focus_set()
 
-        tk.Label(form, text="Password", width=10, anchor="w", bg=LOGIN_WHITE, fg=LOGIN_DARK_BLUE, font=("Arial", 10, "bold")).grid(row=1, column=0, pady=6, sticky="w")
+        tk.Label(form, text="Password", width=10, anchor="w", bg=LOGIN_WHITE, fg=LOGIN_DARK_BLUE, font=("Arial", 10, "bold")).grid(row=1, column=0, pady=8, sticky="w")
         self.password_var = tk.StringVar()
         self.password_entry = tk.Entry(form, textvariable=self.password_var, width=26, show="•", font=("Arial", 11), bg=LOGIN_OFF_WHITE, relief="solid", highlightthickness=1, highlightbackground=LOGIN_BLUE)
-        self.password_entry.grid(row=1, column=1, pady=6, padx=(10, 0))
+        self.password_entry.grid(row=1, column=1, pady=8, padx=(12, 0))
         self.password_entry.bind("<Return>", lambda e: self.do_login())
 
         btn_frame = tk.Frame(form, bg=LOGIN_WHITE)
-        btn_frame.grid(row=2, column=0, columnspan=2, pady=(16, 0))
-        tk.Button(btn_frame, text="Log in", command=self.do_login, width=10, bg=LOGIN_RED, fg="#2d1b0e", relief="flat", padx=14, pady=6, font=("Arial", 10, "bold"), cursor="hand2").pack(side="left", padx=6)
-        tk.Button(btn_frame, text="Sign up", command=self.do_signup, width=10, bg=LOGIN_BLUE, fg=LOGIN_WHITE, relief="flat", padx=14, pady=6, font=("Arial", 10, "bold"), cursor="hand2").pack(side="left", padx=6)
+        btn_frame.grid(row=2, column=0, columnspan=2, pady=(20, 0))
+        tk.Button(btn_frame, text="Log in", command=self.do_login, width=10, bg=LOGIN_RED, fg="#2d1b0e", relief="flat", padx=14, pady=6, font=("Arial", 10, "bold"), cursor="hand2").pack(side="left", padx=8)
+        tk.Button(btn_frame, text="Sign up", command=self.do_signup, width=10, bg=LOGIN_BLUE, fg=LOGIN_WHITE, relief="flat", padx=14, pady=6, font=("Arial", 10, "bold"), cursor="hand2").pack(side="left", padx=8)
 
     def do_login(self):
         ok, msg = auth.verify_user(self.username_var.get(), self.password_var.get())
