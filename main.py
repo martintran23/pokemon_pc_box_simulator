@@ -6,8 +6,10 @@ import json, os
 from models.pokemon import Pokemon
 from models.box import PCBox
 from models.player import Player
+import auth
 
-SAVE_PATH = "data/save.json"
+# Default save path when no user is specified (backward compatibility)
+DEFAULT_SAVE_PATH = "data/save.json"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SPRITE_DIR = "assets/sprites/"
 
@@ -17,9 +19,14 @@ MAX_LEVEL = 100
 
 
 class PCApp(tk.Tk):
-    def __init__(self, player):
+    def __init__(self, player, save_path=None, username=None):
         super().__init__()
-        self.title("Pokémon PC Box System")
+        self.save_path = save_path or os.path.join(BASE_DIR, DEFAULT_SAVE_PATH)
+        self.username = username
+        title = "Pokémon PC Box System"
+        if username:
+            title += f" — {username}"
+        self.title(title)
         self.geometry("900x700")
         self.resizable(False, False)
 
@@ -134,18 +141,18 @@ class PCApp(tk.Tk):
             ],
             "current_box": getattr(self.player, "current_box", 0),
         }
-        os.makedirs(os.path.dirname(SAVE_PATH), exist_ok=True)
+        os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
         try:
-            with open(SAVE_PATH, "w") as f:
+            with open(self.save_path, "w") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
             print("⚠️ Failed to save:", e)
 
     def load_game(self):
-        if not os.path.exists(SAVE_PATH):
+        if not os.path.exists(self.save_path):
             return
         try:
-            with open(SAVE_PATH, "r") as f:
+            with open(self.save_path, "r") as f:
                 content = f.read().strip()
                 if not content:
                     print("⚠️ Empty save file, starting fresh.")
@@ -774,8 +781,71 @@ class PCApp(tk.Tk):
         self.update_display()
         self.save_game()
 
+
+class LoginWindow(tk.Tk):
+    """Sign-up / Login portal; on success launches PCApp with the user's save file."""
+
+    def __init__(self):
+        super().__init__()
+        self.title("Pokémon PC Box — Sign in")
+        self.geometry("380x220")
+        self.resizable(False, False)
+        self.configure(bg="#2d5a27")
+
+        tk.Label(
+            self, text="Pokémon PC Box", font=("Arial", 18, "bold"),
+            bg="#2d5a27", fg="#fff"
+        ).pack(pady=(20, 5))
+        tk.Label(
+            self, text="Sign in to access your Pokémon", font=("Arial", 10),
+            bg="#2d5a27", fg="#ddd"
+        ).pack(pady=(0, 16))
+
+        form = tk.Frame(self, bg="#2d5a27")
+        form.pack(pady=0, padx=30, fill="x")
+
+        tk.Label(form, text="Username", width=10, anchor="w", bg="#2d5a27", fg="#fff").grid(row=0, column=0, pady=4, sticky="w")
+        self.username_var = tk.StringVar()
+        self.username_entry = tk.Entry(form, textvariable=self.username_var, width=24, font=("Arial", 11))
+        self.username_entry.grid(row=0, column=1, pady=4, padx=(8, 0))
+        self.username_entry.focus_set()
+
+        tk.Label(form, text="Password", width=10, anchor="w", bg="#2d5a27", fg="#fff").grid(row=1, column=0, pady=4, sticky="w")
+        self.password_var = tk.StringVar()
+        self.password_entry = tk.Entry(form, textvariable=self.password_var, width=24, show="•", font=("Arial", 11))
+        self.password_entry.grid(row=1, column=1, pady=4, padx=(8, 0))
+        self.password_entry.bind("<Return>", lambda e: self.do_login())
+
+        btn_frame = tk.Frame(self, bg="#2d5a27")
+        btn_frame.pack(pady=20)
+        tk.Button(btn_frame, text="Log in", command=self.do_login, width=10, bg="#1a8c1a", fg="white", relief="flat", padx=12, pady=4).pack(side="left", padx=6)
+        tk.Button(btn_frame, text="Sign up", command=self.do_signup, width=10, bg="#0d5c0d", fg="white", relief="flat", padx=12, pady=4).pack(side="left", padx=6)
+
+    def do_login(self):
+        ok, msg = auth.verify_user(self.username_var.get(), self.password_var.get())
+        if ok:
+            save_path = auth.get_save_path_for_user(msg)
+            self.launch_app(save_path, msg)
+        else:
+            messagebox.showerror("Login failed", msg)
+
+    def do_signup(self):
+        ok, msg = auth.register_user(self.username_var.get(), self.password_var.get())
+        if ok:
+            messagebox.showinfo("Account created", msg)
+            save_path = auth.get_save_path_for_user(self.username_var.get().strip())
+            self.launch_app(save_path, self.username_var.get().strip())
+        else:
+            messagebox.showerror("Sign up failed", msg)
+
+    def launch_app(self, save_path, username):
+        self.destroy()
+        player = Player()
+        app = PCApp(player, save_path=save_path, username=username)
+        app.mainloop()
+
+
 # --- MAIN ---
 if __name__ == "__main__":
-    player = Player()
-    app = PCApp(player)
-    app.mainloop()
+    login = LoginWindow()
+    login.mainloop()
