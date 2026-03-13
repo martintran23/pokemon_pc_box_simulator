@@ -332,11 +332,6 @@ class PCApp(tk.Tk):
         if ptype is None:
             return
 
-        # sprite optional
-        sprite_filename = self.ask_field("Sprite", "Optional: enter sprite filename (e.g., bulbasaur.png):", required=False)
-        if sprite_filename is None:
-            return  # cancelled
-
         # item optional
         item = self.ask_field("Held Item", "Optional: enter held item:", required=False)
         if item is None:
@@ -351,7 +346,27 @@ class PCApp(tk.Tk):
             if mv != "":
                 moves.append(mv)
 
-        sprite_path = os.path.join("assets", "sprites", sprite_filename) if sprite_filename else os.path.join("assets", "sprites", f"{name.lower()}.png")
+        # optional: let user pick a custom PNG sprite from their files
+        use_custom = messagebox.askyesno(
+            "Custom Sprite",
+            "Do you want to choose a custom sprite PNG file?\n\n"
+            "If you choose No, the app will try to use the built‑in sprite "
+            f"at assets/sprites/{name.lower()}.png.",
+        )
+        custom_sprite_path = None
+        if use_custom:
+            sprite_path_candidate = filedialog.askopenfilename(
+                title="Select sprite PNG",
+                filetypes=[("PNG images", "*.png")],
+                parent=self,
+            )
+            if sprite_path_candidate:
+                if not sprite_path_candidate.lower().endswith(".png"):
+                    messagebox.showerror("Invalid file", "Sprite must be a .png image.")
+                else:
+                    custom_sprite_path = sprite_path_candidate
+
+        sprite_path = custom_sprite_path or os.path.join("assets", "sprites", f"{name.lower()}.png")
         new_mon = Pokemon(name, level, ptype, sprite=sprite_path, moves=moves, item=item)
         if area == "box":
             box = self.player.get_current_box()
@@ -581,10 +596,17 @@ class PCApp(tk.Tk):
         alt_name_entry.grid(row=0, column=1, sticky="ew", padx=6)
 
         def choose_alt_sprite():
-            filename = simpledialog.askstring("Alternate Sprite", "Enter sprite filename (e.g., pikachu.png):")
+            filename = filedialog.askopenfilename(
+                title="Select alternate sprite PNG",
+                filetypes=[("PNG images", "*.png")],
+                parent=win,
+            )
             if not filename:
                 return
-            mon.alt_sprite = filename  # store filename only, folder handled in update_preview()
+            if not filename.lower().endswith(".png"):
+                messagebox.showerror("Invalid file", "Alternate sprite must be a .png image.")
+                return
+            mon.alt_sprite = filename
             mon.alt_form_name = alt_name_entry.get().strip() or "Alternate Form"
             show_alt.set(True)
             update_preview()
