@@ -75,7 +75,21 @@
       "alt_form_name": "latios-mega",
       "alt_sprite": "latios-mega.png"
     },
-    null
+    {
+      "name": "Urshifu",
+      "level": 80,
+      "ptype": "Fighting/Water",
+      "sprite": "assets\\sprites\\urshifu.png",
+      "moves": [
+        "Rapid Strike",
+        "U-turn",
+        "Close Combat",
+        "Water Jet"
+      ],
+      "item": "Choice Scarf",
+      "alt_form_name": null,
+      "alt_sprite": null
+    }
   ],
   "boxes": [
     [
