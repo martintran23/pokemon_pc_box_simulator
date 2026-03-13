@@ -1,6 +1,20 @@
 {
   "party": [
-    null,
+    {
+      "name": "Arceus",
+      "level": 100,
+      "ptype": "Normal",
+      "sprite": "C:/Users/Martin Tran/Downloads/arceus-normal.png",
+      "moves": [
+        "Swords Dance",
+        "Extreme Speed",
+        "Shadow Claw",
+        "Recover"
+      ],
+      "item": null,
+      "alt_form_name": null,
+      "alt_sprite": null
+    },
     null,
     null,
     null,
@@ -9,21 +23,7 @@
   ],
   "boxes": [
     [
-      {
-        "name": "Arceus",
-        "level": 100,
-        "ptype": "Normal",
-        "sprite": "C:/Users/Martin Tran/Downloads/arceus-normal.png",
-        "moves": [
-          "Judgment",
-          "",
-          "",
-          ""
-        ],
-        "item": "",
-        "alt_form_name": null,
-        "alt_sprite": null
-      },
+      null,
       null,
       null,
       null,
