@@ -782,44 +782,57 @@ class PCApp(tk.Tk):
         self.save_game()
 
 
+# Pokémon-themed colors for login (match PC box red, pastel blue)
+LOGIN_RED = "#ff9b9b"       # same as PC box theme (pc_area, nav_frame)
+LOGIN_BLUE = "#9EC5E0"      # soft pastel blue
+LOGIN_WHITE = "#FFFFFF"
+LOGIN_OFF_WHITE = "#F5F5F5"
+LOGIN_DARK_BLUE = "#5B8FB9" # softer blue for labels
+
+
 class LoginWindow(tk.Tk):
     """Sign-up / Login portal; on success launches PCApp with the user's save file."""
 
     def __init__(self):
         super().__init__()
         self.title("Pokémon PC Box — Sign in")
-        self.geometry("380x220")
+        self.geometry("400x260")
         self.resizable(False, False)
-        self.configure(bg="#2d5a27")
+        self.configure(bg=LOGIN_WHITE)
 
+        # Red header strip (same #ff9b9b as PC box)
+        header = tk.Frame(self, bg=LOGIN_RED, height=70)
+        header.pack(fill="x")
+        header.pack_propagate(False)
         tk.Label(
-            self, text="Pokémon PC Box", font=("Arial", 18, "bold"),
-            bg="#2d5a27", fg="#fff"
-        ).pack(pady=(20, 5))
+            header, text="Pokémon PC Box", font=("Arial", 20, "bold"),
+            bg=LOGIN_RED, fg="#2d1b0e"
+        ).pack(pady=(14, 2))
         tk.Label(
-            self, text="Sign in to access your Pokémon", font=("Arial", 10),
-            bg="#2d5a27", fg="#ddd"
-        ).pack(pady=(0, 16))
+            header, text="Sign in to access your Pokémon", font=("Arial", 10),
+            bg=LOGIN_RED, fg="#4a3728"
+        ).pack(pady=(0, 4))
 
-        form = tk.Frame(self, bg="#2d5a27")
-        form.pack(pady=0, padx=30, fill="x")
+        # Form on white
+        form = tk.Frame(self, bg=LOGIN_WHITE, padx=30, pady=20)
+        form.pack(fill="both", expand=True)
 
-        tk.Label(form, text="Username", width=10, anchor="w", bg="#2d5a27", fg="#fff").grid(row=0, column=0, pady=4, sticky="w")
+        tk.Label(form, text="Username", width=10, anchor="w", bg=LOGIN_WHITE, fg=LOGIN_DARK_BLUE, font=("Arial", 10, "bold")).grid(row=0, column=0, pady=6, sticky="w")
         self.username_var = tk.StringVar()
-        self.username_entry = tk.Entry(form, textvariable=self.username_var, width=24, font=("Arial", 11))
-        self.username_entry.grid(row=0, column=1, pady=4, padx=(8, 0))
+        self.username_entry = tk.Entry(form, textvariable=self.username_var, width=26, font=("Arial", 11), bg=LOGIN_OFF_WHITE, relief="solid", highlightthickness=1, highlightbackground=LOGIN_BLUE)
+        self.username_entry.grid(row=0, column=1, pady=6, padx=(10, 0))
         self.username_entry.focus_set()
 
-        tk.Label(form, text="Password", width=10, anchor="w", bg="#2d5a27", fg="#fff").grid(row=1, column=0, pady=4, sticky="w")
+        tk.Label(form, text="Password", width=10, anchor="w", bg=LOGIN_WHITE, fg=LOGIN_DARK_BLUE, font=("Arial", 10, "bold")).grid(row=1, column=0, pady=6, sticky="w")
         self.password_var = tk.StringVar()
-        self.password_entry = tk.Entry(form, textvariable=self.password_var, width=24, show="•", font=("Arial", 11))
-        self.password_entry.grid(row=1, column=1, pady=4, padx=(8, 0))
+        self.password_entry = tk.Entry(form, textvariable=self.password_var, width=26, show="•", font=("Arial", 11), bg=LOGIN_OFF_WHITE, relief="solid", highlightthickness=1, highlightbackground=LOGIN_BLUE)
+        self.password_entry.grid(row=1, column=1, pady=6, padx=(10, 0))
         self.password_entry.bind("<Return>", lambda e: self.do_login())
 
-        btn_frame = tk.Frame(self, bg="#2d5a27")
-        btn_frame.pack(pady=20)
-        tk.Button(btn_frame, text="Log in", command=self.do_login, width=10, bg="#1a8c1a", fg="white", relief="flat", padx=12, pady=4).pack(side="left", padx=6)
-        tk.Button(btn_frame, text="Sign up", command=self.do_signup, width=10, bg="#0d5c0d", fg="white", relief="flat", padx=12, pady=4).pack(side="left", padx=6)
+        btn_frame = tk.Frame(form, bg=LOGIN_WHITE)
+        btn_frame.grid(row=2, column=0, columnspan=2, pady=(16, 0))
+        tk.Button(btn_frame, text="Log in", command=self.do_login, width=10, bg=LOGIN_RED, fg="#2d1b0e", relief="flat", padx=14, pady=6, font=("Arial", 10, "bold"), cursor="hand2").pack(side="left", padx=6)
+        tk.Button(btn_frame, text="Sign up", command=self.do_signup, width=10, bg=LOGIN_BLUE, fg=LOGIN_WHITE, relief="flat", padx=14, pady=6, font=("Arial", 10, "bold"), cursor="hand2").pack(side="left", padx=6)
 
     def do_login(self):
         ok, msg = auth.verify_user(self.username_var.get(), self.password_var.get())
