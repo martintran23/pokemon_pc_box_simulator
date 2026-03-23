@@ -68,7 +68,7 @@ class PCApp(tk.Tk):
 
     # ---------------- Widgets ----------------
     def create_widgets(self):
-        top_bar = tk.Frame(self, bg="#f0f0f0")
+        top_bar = tk.Frame(self, bg=LOGIN_BLUE)
         top_bar.pack(side="top", fill="x")
         tk.Button(top_bar, text="Log out", command=self.logout).pack(side="right", padx=10, pady=6)
 
