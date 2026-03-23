@@ -68,6 +68,10 @@ class PCApp(tk.Tk):
 
     # ---------------- Widgets ----------------
     def create_widgets(self):
+        top_bar = tk.Frame(self, bg="#f0f0f0")
+        top_bar.pack(side="top", fill="x")
+        tk.Button(top_bar, text="Log out", command=self.logout).pack(side="right", padx=10, pady=6)
+
         # Left: Party
         self.party_frame = tk.Frame(self, bg="#f0f0f0", width=200)
         self.party_frame.pack(side="left", fill="y")
@@ -180,6 +184,16 @@ class PCApp(tk.Tk):
     def on_close(self):
         self.save_game()
         self.destroy()
+
+    def logout(self):
+        confirm = messagebox.askyesno("Log out", "Log out and return to login screen?")
+        if not confirm:
+            return
+
+        self.save_game()
+        self.destroy()
+        login = LoginWindow()
+        login.mainloop()
 
     # ---------------- Sprite Loader ----------------
     def get_sprite(self, pokemon, size=(60, 60)):
