@@ -15,21 +15,7 @@
       "alt_form_name": null,
       "alt_sprite": null
     },
-    {
-      "name": "Latios",
-      "level": 100,
-      "ptype": "Psychic/Dragon",
-      "sprite": "assets\\sprites\\latios.png",
-      "moves": [
-        "",
-        "",
-        "",
-        ""
-      ],
-      "item": "",
-      "alt_form_name": null,
-      "alt_sprite": null
-    },
+    null,
     null,
     null,
     null,
@@ -37,7 +23,21 @@
   ],
   "boxes": [
     [
-      null,
+      {
+        "name": "Latios",
+        "level": 100,
+        "ptype": "Psychic/Dragon",
+        "sprite": "assets\\sprites\\latios.png",
+        "moves": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "item": "",
+        "alt_form_name": null,
+        "alt_sprite": null
+      },
       null,
       null,
       null,
