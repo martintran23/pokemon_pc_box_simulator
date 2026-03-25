@@ -29,6 +29,7 @@ class PCApp(tk.Tk):
         self.title(title)
         self.geometry("900x700")
         self.resizable(False, False)
+        self.configure(bg=LOGIN_WHITE)
 
         self.player = player
         self.drag_data = {"widget": None, "pokemon": None, "origin_index": None, "origin_area": None, "floating": None}
@@ -68,16 +69,41 @@ class PCApp(tk.Tk):
 
     # ---------------- Widgets ----------------
     def create_widgets(self):
-        top_bar = tk.Frame(self, bg=LOGIN_BLUE)
+        top_bar = tk.Frame(self, bg=LOGIN_RED)
         top_bar.pack(side="top", fill="x")
-        tk.Button(top_bar, text="Log out", command=self.logout).pack(side="right", padx=10, pady=6)
+        tk.Button(
+            top_bar,
+            text="Log out",
+            command=self.logout,
+            bg=LOGIN_RED,
+            fg="#2d1b0e",
+            activebackground="#f28b8b",
+            relief="flat",
+            padx=12,
+            pady=4,
+            font=("Arial", 10, "bold"),
+            cursor="hand2",
+        ).pack(side="right", padx=10, pady=6)
+
+        # Decorative frame bars (to encase the interface)
+        bottom_bar = tk.Frame(self, bg=LOGIN_RED, height=14)
+        bottom_bar.pack(side="bottom", fill="x")
+        bottom_bar.pack_propagate(False)
+
+        left_bar = tk.Frame(self, bg=LOGIN_RED, width=14)
+        left_bar.pack(side="left", fill="y")
+        left_bar.pack_propagate(False)
+
+        right_bar = tk.Frame(self, bg=LOGIN_RED, width=14)
+        right_bar.pack(side="right", fill="y")
+        right_bar.pack_propagate(False)
 
         # Left: Party
-        self.party_frame = tk.Frame(self, bg="#f0f0f0", width=200)
+        self.party_frame = tk.Frame(self, bg=LOGIN_RED, width=200)
         self.party_frame.pack(side="left", fill="y")
 
         tk.Label(
-            self.party_frame, text="Your Party", font=("Arial", 14, "bold"), bg="#f0f0f0"
+            self.party_frame, text="Your Party", font=("Arial", 14, "bold"), bg=LOGIN_RED, fg="#2d1b0e"
         ).pack(pady=10)
 
         self.party_labels = []
@@ -87,7 +113,7 @@ class PCApp(tk.Tk):
                 text="(empty)",
                 bd=2,
                 relief="raised",
-                bg="#ffffff",
+                bg=LOGIN_WHITE,
                 compound="top",
             )
             lbl.config(width=75, height=75)
@@ -98,15 +124,26 @@ class PCApp(tk.Tk):
             lbl.bind("<Button-3>", lambda e, i=i: self.right_click("party", i))
             self.party_labels.append(lbl)
 
+        # Red spacer to match left-side frame thickness
+        party_right_bar = tk.Frame(self, bg=LOGIN_RED, width=14)
+        party_right_bar.pack(side="left", fill="y")
+        party_right_bar.pack_propagate(False)
+
         # Right: PC Box Area
-        self.pc_area = tk.Frame(self, bg="#ff9b9b")
+        self.pc_area = tk.Frame(self, bg=LOGIN_BLUE)
         self.pc_area.pack(side="right", expand=True, fill="both")
 
-        self.box_frame = tk.Frame(self.pc_area, bg="#ff9b9b", padx=20, pady=20)
+        self.box_frame = tk.Frame(self.pc_area, bg=LOGIN_BLUE, padx=20, pady=20)
         self.box_frame.pack(expand=True)
 
         self.box_canvas = tk.Canvas(
-            self.box_frame, width=650, height=550, highlightthickness=0, bg="#ffffff"
+            self.box_frame,
+            width=650,
+            height=550,
+            highlightthickness=0,
+            bd=0,
+            relief="flat",
+            bg=LOGIN_BLUE,
         )
         self.box_canvas.pack()
         self.box_canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
@@ -128,12 +165,32 @@ class PCApp(tk.Tk):
             self.slot_positions.append((x, y))
 
         # Navigation buttons
-        nav_frame = tk.Frame(self.box_frame, bg="#ff9b9b")
+        nav_frame = tk.Frame(self.box_frame, bg=LOGIN_BLUE)
         nav_frame.pack(pady=10)
-        tk.Button(nav_frame, text="< Prev", command=self.prev_box).grid(row=0, column=0, padx=10)
-        self.box_name_lbl = tk.Label(nav_frame, text="", bg="#ff9b9b", font=("Arial", 12, "bold"))
+        tk.Button(
+            nav_frame,
+            text="< Prev",
+            command=self.prev_box,
+            bg=LOGIN_BLUE,
+            fg=LOGIN_WHITE,
+            activebackground="#87b6d8",
+            relief="flat",
+            font=("Arial", 10, "bold"),
+            cursor="hand2",
+        ).grid(row=0, column=0, padx=10)
+        self.box_name_lbl = tk.Label(nav_frame, text="", bg=LOGIN_BLUE, fg=LOGIN_WHITE, font=("Arial", 12, "bold"))
         self.box_name_lbl.grid(row=0, column=1)
-        tk.Button(nav_frame, text="Next >", command=self.next_box).grid(row=0, column=2, padx=10)
+        tk.Button(
+            nav_frame,
+            text="Next >",
+            command=self.next_box,
+            bg=LOGIN_BLUE,
+            fg=LOGIN_WHITE,
+            activebackground="#87b6d8",
+            relief="flat",
+            font=("Arial", 10, "bold"),
+            cursor="hand2",
+        ).grid(row=0, column=2, padx=10)
 
     # ---------------- Save/Load ----------------
     def save_game(self):
