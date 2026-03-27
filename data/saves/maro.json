@@ -29,14 +29,14 @@
         "ptype": "Psychic/Dragon",
         "sprite": "assets\\sprites\\latios.png",
         "moves": [
-          "",
-          "",
-          "",
-          ""
+          "Roost",
+          "Thunderbolt",
+          "Psychic",
+          "Earthquake"
         ],
-        "item": "",
-        "alt_form_name": null,
-        "alt_sprite": null
+        "item": "Latiosite",
+        "alt_form_name": "Mega Latios",
+        "alt_sprite": "C:/Users/Martin Tran/Downloads/latios-mega.png"
       },
       null,
       null,
