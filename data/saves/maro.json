@@ -19,21 +19,7 @@
     null,
     null,
     null,
-    {
-      "name": "Latios",
-      "level": 100,
-      "ptype": "Psychic/Dragon",
-      "sprite": "assets\\sprites\\latios.png",
-      "moves": [
-        "Roost",
-        "Thunderbolt",
-        "Psychic",
-        "Earthquake"
-      ],
-      "item": "Latiosite",
-      "alt_form_name": "Mega Latios",
-      "alt_sprite": "C:/Users/Martin Tran/Downloads/latios-mega.png"
-    }
+    null
   ],
   "boxes": [
     [
