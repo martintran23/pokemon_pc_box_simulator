@@ -21,14 +21,14 @@
       "ptype": "Ground",
       "sprite": "C:/Users/Martin Tran/Downloads/groudon.png",
       "moves": [
-        "Earthquake",
-        "Lava Plume",
         "Stealth Rock",
+        "Lava Plume",
+        "Earthquake",
         "Dragon Tail"
       ],
       "item": "Red Orb",
-      "alt_form_name": null,
-      "alt_sprite": null
+      "alt_form_name": "Primal Groudon",
+      "alt_sprite": "C:/Users/Martin Tran/Downloads/groudon-primal.png"
     },
     null,
     null,
