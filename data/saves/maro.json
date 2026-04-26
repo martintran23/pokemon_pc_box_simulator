@@ -13,7 +13,8 @@
       ],
       "item": null,
       "alt_form_name": null,
-      "alt_sprite": null
+      "alt_sprite": null,
+      "alt_ptype": null
     },
     {
       "name": "Groudon",
@@ -28,7 +29,8 @@
       ],
       "item": "Red Orb",
       "alt_form_name": "Primal Groudon",
-      "alt_sprite": "C:/Users/Martin Tran/Downloads/groudon-primal.png"
+      "alt_sprite": "C:/Users/Martin Tran/Downloads/groudon-primal.png",
+      "alt_ptype": "Ground/Fire"
     },
     null,
     null,
