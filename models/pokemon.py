@@ -9,6 +9,7 @@ class Pokemon:
         item=None,
         alt_form_name=None,
         alt_sprite=None,
+        alt_ptype=None,
     ):
         self.name = name
         self.level = level
@@ -23,6 +24,7 @@ class Pokemon:
         # Alternate form (optional)
         self.alt_form_name = alt_form_name      # e.g. "Mega", "Gigantamax"
         self.alt_sprite = alt_sprite            # path string or None
+        self.alt_ptype = alt_ptype              # e.g. "Ground,Fire"
 
     def get_sprite_path(self, show_alt=False):
         """Returns the correct sprite path based on form toggle."""

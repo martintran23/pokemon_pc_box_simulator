@@ -491,6 +491,8 @@ class PCApp(tk.Tk):
             mon.alt_form_name = None
         if not hasattr(mon, "alt_sprite"):
             mon.alt_sprite = None
+        if not hasattr(mon, "alt_ptype"):
+            mon.alt_ptype = None
 
         win = tk.Toplevel(self)
         win.title(f"{mon.name} Info")
@@ -507,7 +509,8 @@ class PCApp(tk.Tk):
         tk.Label(basic_frame, text=str(mon.level)).grid(row=1, column=1, sticky="w", padx=6)
 
         tk.Label(basic_frame, text="Type:", font=("Arial", 10, "bold")).grid(row=2, column=0, sticky="w")
-        tk.Label(basic_frame, text=mon.ptype).grid(row=2, column=1, sticky="w", padx=6)
+        type_value_lbl = tk.Label(basic_frame, text=mon.ptype)
+        type_value_lbl.grid(row=2, column=1, sticky="w", padx=6)
 
         # ---- Sprite Preview (BASE + ALT toggle) ----
         sprite_frame = tk.Frame(win, padx=10, pady=6)
@@ -521,6 +524,8 @@ class PCApp(tk.Tk):
         def update_preview():
             use_alt = show_alt.get() and mon.alt_sprite
             sprite_path = mon.alt_sprite if use_alt else mon.sprite
+            display_type = mon.alt_ptype if use_alt and mon.alt_ptype else mon.ptype
+            type_value_lbl.config(text=display_type)
 
             # Normalize sprite path
             if sprite_path:
@@ -587,6 +592,8 @@ class PCApp(tk.Tk):
             mon.alt_form_name = None
         if not hasattr(mon, "alt_sprite"):
             mon.alt_sprite = None
+        if not hasattr(mon, "alt_ptype"):
+            mon.alt_ptype = None
 
         # Create edit window
         win = tk.Toplevel(self)
@@ -622,12 +629,16 @@ class PCApp(tk.Tk):
         sprite_frame = tk.Frame(win, padx=10, pady=6)
         sprite_frame.pack(fill="x")
         tk.Label(sprite_frame, text="Sprite Preview:").pack(anchor="w")
+        preview_type_label = tk.Label(sprite_frame, text=f"Displayed Type: {mon.ptype}")
+        preview_type_label.pack(anchor="w")
 
         show_alt = tk.BooleanVar(value=False)
 
         def update_preview():
             use_alt = show_alt.get() and mon.alt_sprite
             sprite_path = mon.alt_sprite if use_alt else mon.sprite
+            display_type = mon.alt_ptype if use_alt and mon.alt_ptype else mon.ptype
+            preview_type_label.config(text=f"Displayed Type: {display_type}")
 
             # Normalize the path
             if not os.path.isabs(sprite_path):
@@ -675,6 +686,11 @@ class PCApp(tk.Tk):
         alt_name_entry.insert(0, mon.alt_form_name or "")
         alt_name_entry.grid(row=0, column=1, sticky="ew", padx=6)
 
+        tk.Label(alt_frame, text="Alt Type(s):").grid(row=1, column=0, sticky="w")
+        alt_type_entry = tk.Entry(alt_frame)
+        alt_type_entry.insert(0, mon.alt_ptype or "")
+        alt_type_entry.grid(row=1, column=1, sticky="ew", padx=6)
+
         def choose_alt_sprite():
             filename = filedialog.askopenfilename(
                 title="Select alternate sprite PNG",
@@ -695,7 +711,7 @@ class PCApp(tk.Tk):
             alt_frame,
             text="Set Alt Sprite",
             command=choose_alt_sprite
-        ).grid(row=1, column=0, columnspan=2, pady=4)
+        ).grid(row=2, column=0, columnspan=2, pady=4)
 
         alt_frame.columnconfigure(1, weight=1)
 
@@ -758,6 +774,7 @@ class PCApp(tk.Tk):
             mon.moves = [e.get().strip() for e in move_entries if e.get().strip()]
             mon.item = item_entry.get().strip() or None
             mon.alt_form_name = alt_name_entry.get().strip() or mon.alt_form_name
+            mon.alt_ptype = alt_type_entry.get().strip() or None
 
             self.update_display()
             self.save_game()
