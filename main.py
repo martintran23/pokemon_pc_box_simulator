@@ -77,7 +77,7 @@ class PCApp(tk.Tk):
             command=self.logout,
             bg=LOGIN_RED,
             fg="#2d1b0e",
-            activebackground="#f28b8b",
+            activebackground="#d96e6e",
             relief="raised",
             bd=2,
             highlightthickness=1,
@@ -902,7 +902,7 @@ class PCApp(tk.Tk):
 
 
 # Pokémon-themed colors for login (match PC box red, pastel blue)
-LOGIN_RED = "#ff9b9b"       # same as PC box theme (pc_area, nav_frame)
+LOGIN_RED = "#e87f7f"       # same as PC box theme (pc_area, nav_frame)
 LOGIN_BLUE = "#9EC5E0"      # soft pastel blue
 LOGIN_WHITE = "#FFFFFF"
 LOGIN_OFF_WHITE = "#F5F5F5"
@@ -919,7 +919,7 @@ class LoginWindow(tk.Tk):
         self.resizable(False, False)
         self.configure(bg=LOGIN_WHITE)
 
-        # Red header strip (same #ff9b9b as PC box) — labels centered
+        # Red header strip (same as PC box) — labels centered
         header = tk.Frame(self, bg=LOGIN_RED, height=128)
         header.pack(fill="x")
         header.pack_propagate(False)
