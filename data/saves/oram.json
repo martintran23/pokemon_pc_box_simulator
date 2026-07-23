@@ -1,20 +1,6 @@
 {
   "party": [
-    {
-      "name": "Bulbasaur",
-      "level": 5,
-      "ptype": "Grass/Poison",
-      "sprite": "C:/Users/Martin Tran/Downloads/bulbasaur.png",
-      "moves": [
-        "Tackle",
-        "Growl",
-        "Vine Whip"
-      ],
-      "item": "",
-      "alt_form_name": null,
-      "alt_sprite": null,
-      "alt_ptype": null
-    },
+    null,
     null,
     null,
     null,
