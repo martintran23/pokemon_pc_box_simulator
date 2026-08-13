@@ -16,22 +16,7 @@
       "alt_sprite": null,
       "alt_ptype": null
     },
-    {
-      "name": "Groudon",
-      "level": 100,
-      "ptype": "Ground",
-      "sprite": "C:/Users/Martin Tran/Downloads/groudon.png",
-      "moves": [
-        "Stealth Rock",
-        "Lava Plume",
-        "Earthquake",
-        "Dragon Tail"
-      ],
-      "item": "Red Orb",
-      "alt_form_name": "Primal Groudon",
-      "alt_sprite": "C:/Users/Martin Tran/Downloads/groudon-primal.png",
-      "alt_ptype": "Ground/Fire"
-    },
+    null,
     null,
     null,
     null,
@@ -39,7 +24,22 @@
   ],
   "boxes": [
     [
-      null,
+      {
+        "name": "Groudon",
+        "level": 100,
+        "ptype": "Ground",
+        "sprite": "C:/Users/Martin Tran/Downloads/groudon.png",
+        "moves": [
+          "Stealth Rock",
+          "Lava Plume",
+          "Earthquake",
+          "Dragon Tail"
+        ],
+        "item": "Red Orb",
+        "alt_form_name": "Primal Groudon",
+        "alt_sprite": "C:/Users/Martin Tran/Downloads/groudon-primal.png",
+        "alt_ptype": "Ground/Fire"
+      },
       null,
       null,
       null,
