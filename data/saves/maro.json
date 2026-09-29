@@ -39,17 +39,7 @@
   ],
   "boxes": [
     [
-      {
-        "name": "bulbasaur",
-        "level": 2,
-        "ptype": "grass poison",
-        "sprite": "assets\\sprites\\bulbasaur.png",
-        "moves": [],
-        "item": "",
-        "alt_form_name": null,
-        "alt_sprite": null,
-        "alt_ptype": null
-      },
+      null,
       null,
       null,
       null,
